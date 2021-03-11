@@ -1,29 +1,31 @@
-import 'react-native-gesture-handler';
-import * as React from 'react';
-import { AppRegistry } from 'react-native';
-import NavigatorContainer from '@react-navigation/native'
-import createStackNavigation from '@react-navigation/stack'
+import React                       from 'react';
+import {StyleSheet}                from 'react-native';
+import {NavigationContainer}       from '@react-navigation/native'
+import {createStackNavigator}      from '@react-navigation/stack'
+import {Provider as PaperProvider} from 'react-native-paper';
+import LoginScreen                 from "./screens/LoginScreen";
 
-import { Provider as PaperProvider } from 'react-native-paper';
-import { name as appName } from './app.json';
+const Stack = createStackNavigator();
 
-import {AuthStackNavigator} from './navigators/AuthStackNavigator'
-
-
-
-const RootStack = createStackNavigation();
-
-export default function Main() {
+const App = () => {
   return (
-    <PaperProvider >
-      <NavigatorContainer>
-        <RootStack.Navigator screenOptions={{ headerShown: false}}>
-          <RootStack.Screen name={'AuthStack'} component={AuthStackNavigator} />
-        </RootStack.Navigator>
-      </NavigatorContainer>
+    <PaperProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={LoginScreen}/>
+        </Stack.Navigator>
+      </NavigationContainer>
     </PaperProvider>
   );
 }
-AppRegistry.registerComponent(appName, () => Main);
+export default App
 
+const styles = StyleSheet.create({
+                                   container: {
+                                     flex           : 1,
+                                     backgroundColor: '#fff',
+                                     alignItems     : 'center',
+                                     justifyContent : 'center',
+                                   },
+                                 });
 
