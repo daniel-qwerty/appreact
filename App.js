@@ -1,21 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import * as React from 'react';
+import { AppRegistry } from 'react-native';
+import NavigatorContainer from '@react-navigation/native'
+import createStackNavigation from '@react-navigation/stack'
 
-export default function App() {
+import { Provider as PaperProvider } from 'react-native-paper';
+import { name as appName } from './app.json';
+
+import {AuthStackNavigator} from './navigators/AuthStackNavigator'
+
+
+
+const RootStack = createStackNavigation();
+
+export default function Main() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <PaperProvider >
+      <NavigatorContainer>
+        <RootStack.Navigator screenOptions={{ headerShown: false}}>
+          <RootStack.Screen name={'AuthStack'} component={AuthStackNavigator} />
+        </RootStack.Navigator>
+      </NavigatorContainer>
+    </PaperProvider>
   );
 }
+AppRegistry.registerComponent(appName, () => Main);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
