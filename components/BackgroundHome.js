@@ -10,20 +10,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 //   children: React.ReactNode
 // };
 
-const Background = ({ children, Props }) => (
+const BackgroundHome = ({ children, Props }) => (
   <ImageBackground
     source={require('../assets/images/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}
   >
     <SafeAreaView style={{  height: '100%',}}>
-        
+         <ScrollView style={{  height: '100%',}}>
            <KeyboardAvoidingView style={styles.container} >
       
          {children}
       
     </KeyboardAvoidingView>
-
+         </ScrollView>
     
     </SafeAreaView>
   </ImageBackground>
@@ -46,4 +46,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(Background);
+export default memo(BackgroundHome);

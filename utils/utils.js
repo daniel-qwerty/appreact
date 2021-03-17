@@ -18,3 +18,9 @@ export const nameValidator = (name) => {
 
   return '';
 };
+
+export const descriptionValidator = (description) => {
+  if (!description || description.length <= 0) return 'Description cannot be empty.';
+
+  return '';
+};
