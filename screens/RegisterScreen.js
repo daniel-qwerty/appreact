@@ -79,7 +79,7 @@ export default function RegisterScreen({navigation}) {
       <Text style={styles.label}> Or </Text>
       <ButtonsLogin/>
       <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+        <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
         </TouchableOpacity>
       </View>
@@ -89,7 +89,7 @@ export default function RegisterScreen({navigation}) {
 
 const styles = StyleSheet.create({
   label: {
-  
+   fontWeight:'600'
   },
   button: {
     marginTop: 24,

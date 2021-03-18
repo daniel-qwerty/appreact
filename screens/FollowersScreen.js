@@ -56,6 +56,7 @@ export default function FollowersScreen({navigation}) {
       }}
         data={images}
         renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
         numColumns={numColumns}/>
 
     </Background>

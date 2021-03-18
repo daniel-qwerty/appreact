@@ -7,9 +7,11 @@ import Logo from '../components/Logo'
 import Background from '../components/Background'
 import TextInputForDate from '../components/TextInputDate';
 import Button from '../components/Botton'
+import FilterButton from '../components/FilterButton'
 import Header from '../components/Header'
 import {theme} from '../utils/theme'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DropDownList from '../components/DropDownList';
 
 export default function BillingScreen({navigation}) {
 
@@ -40,32 +42,56 @@ export default function BillingScreen({navigation}) {
   const [listData,
     setListData] = React.useState(data);
 
-  const [date,
-    setDate] = useState();
+  const [dateFrom,
+    setDateFrom] = useState(false);
+  const [dateTo,
+    setDateTo] = useState(false);
 
-  const [isDatePickerVisible,
-    setDatePickerVisibility] = useState(false);
+  const [isDatePickerVisibledDateFrom,
+    setDatePickerVisibilityDateFrom] = useState(false);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
-    setDate(currentDate);
-    console.log(currentDate);
+  const [isDatePickerVisibledDateTo,
+    setDatePickerVisibilityDateTo] = useState(false);
+
+  const [isFilterDatesVisibled,
+    setIsFilterDatesVisibled] = useState(false);
+
+  const showFilterDates = () => {
+    //setIsFilterDatesVisibled(true);
+    setIsFilterDatesVisibled(previousState => !previousState);
   };
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
+  const hideFilterDates = () => {
+    setIsFilterDatesVisibled(false);
   };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
+  const showDatePickerFrom = () => {
+    setDatePickerVisibilityDateFrom(true);
+    
   };
 
-  const handleConfirm = (date) => {
-    //console.warn("A date has been picked: ", date);
+  const hideDatePickerFrom = () => {
+    setDatePickerVisibilityDateFrom(false);
+  };
+
+  const showDatePickerTo = () => {
+    setDatePickerVisibilityDateTo(true);
+  };
+
+  const hideDatePickerTo = () => {
+    setDatePickerVisibilityDateTo(false);
+  };
+
+  const handleConfirmFrom = (date) => {
     const currentDate = date;
-    setDate(currentDate);
-    hideDatePicker();
+    setDateFrom(currentDate);
+    hideDatePickerFrom();
+  };
+
+  const handleConfirmTo = (date) => {
+    const currentDate = date;
+    setDateTo(currentDate);
+    hideDatePickerTo();
   };
 
   function renderItem({item}) {
@@ -83,7 +109,7 @@ export default function BillingScreen({navigation}) {
           right={props => <Text
           {...props}
           style={{
-          fontSize: 20,
+          fontSize: 25,
           marginVertical: 10,
           marginHorizontal: 5
         }}>${item.total}</Text>}/>
@@ -92,42 +118,71 @@ export default function BillingScreen({navigation}) {
     );
   }
 
-  useEffect(() => {
-
-    setDate(new Date())
-
-  }, [])
-
   return (
     <Background>
 
       <Header>Billing</Header>
 
-      <Card style={styles.card}>
+      <FilterButton Press={showFilterDates} />
 
+      {isFilterDatesVisibled
+        ? (
+          <Card style={styles.cardDates}>
+            <Card.Content >
+              <TextInputForDate
+                label="From"
+                returnKeyType="go"
+                value={dateFrom
+                ? dateFrom.toLocaleDateString("en-US")
+                : ''}
+                editable={true}
+                onFocus={showDatePickerFrom}/>
+
+              <TextInputForDate
+                label="To"
+                returnKeyType="go"
+                value={dateTo
+                ? dateTo.toLocaleDateString("en-US")
+                : ''}
+                editable={true}
+                onFocus={showDatePickerTo}/>
+
+              <DateTimePickerModal
+                isVisible={isDatePickerVisibledDateTo}
+                mode="date"
+                onConfirm={handleConfirmTo}
+                onCancel={hideDatePickerTo}/>
+
+              <DateTimePickerModal
+                isVisible={isDatePickerVisibledDateFrom}
+                mode="date"
+                onConfirm={handleConfirmFrom}
+                onCancel={hideDatePickerFrom}/>
+
+            </Card.Content>
+          </Card>
+        )
+        : ( <></>)}
+
+      <Card style={styles.cardFilter} zIndex='7000'>
         <Card.Content >
-
-          <TextInputForDate
-            label="From"
-            returnKeyType="go"
-            value={date
-            ? date.toLocaleDateString("en-US")
-            : ''}
-            editable={true}
-            onFocus={showDatePicker}/>
-          <TextInputForDate
-            label="To"
-            returnKeyType="go"
-            value={date.toLocaleDateString("en-US")}
-            editable={true}
-            onFocus={showDatePicker}/>
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}/>
-
+          <DropDownList
+            items={[
+            {
+              label: 'Item 4',
+              value: 'item5'
+            }, {
+              label: 'Item 5',
+              value: 'item6'
+            }
+          ]}
+            containerStyle={{
+            height: 50,
+            width: '100%'
+          }}
+          zIndex='7000'
+            placeholder="Color of eyes"
+            onChangeItem={item => console.log(item.label, item.value)}/>
         </Card.Content>
       </Card>
 
@@ -139,11 +194,15 @@ export default function BillingScreen({navigation}) {
       }}
         data={listData}
         renderItem={renderItem}
-        numColumns={1}/>
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={1}
+        zIndex='6000'/>
 
     </Background>
   );
 }
+
+//donde es tu codigo?
 
 const styles = StyleSheet.create({
   container: {
@@ -169,9 +228,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 40
   },
-  card: {
+  cardDates: {
     marginVertical: 10,
-    height: 200,
+    height: 150,
     width: '100%'
+  },
+  cardFilter: {
+    marginVertical: 10,
+    height: 80,
+    width: '100%',
+    backgroundColor: theme.colors.primary
   }
 });

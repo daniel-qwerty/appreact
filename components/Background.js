@@ -1,30 +1,19 @@
-import React, { memo } from 'react';
-import {
-  ImageBackground,
-  StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-//  let Props = {
-//   children: React.ReactNode
-// };
+import React, {memo} from 'react';
+import {ImageBackground, StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+//  let Props = {   children: React.ReactNode };
 
-const Background = ({ children, Props }) => (
+const Background = ({children, Props}) => (
   <ImageBackground
     source={require('../assets/images/background_dot.png')}
     resizeMode="repeat"
-    style={styles.background}
-  >
-    <SafeAreaView style={{  height: '100%',}}>
-        
-           <KeyboardAvoidingView style={styles.container} >
-      
-         {children}
-      
-    </KeyboardAvoidingView>
-
-    
+    style={styles.background}>
+    <SafeAreaView style={{
+      height: '100%'
+    }}>
+      <KeyboardAvoidingView style={styles.container}>
+        {children}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   </ImageBackground>
 );
@@ -42,8 +31,8 @@ const styles = StyleSheet.create({
     maxWidth: '85%',
     alignSelf: 'center',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center'
+  }
 });
 
 export default memo(Background);

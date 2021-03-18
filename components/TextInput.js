@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white',
+    height:40
   },
   error: {
     fontSize: 14,

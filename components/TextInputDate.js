@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { TextInput as Input } from 'react-native-paper';
+import { TextInput as Input, IconButton } from 'react-native-paper';
+import {theme} from '../utils/theme'
 
 
 // type Props = React.ComponentProps<typeof Input> & { errorText?: string };
@@ -11,9 +12,14 @@ const TextInputForDate = ({ errorText, ...props }) => (
     <Input
       style={styles.input}
       underlineColor="transparent"
-      mode="outlined"
+      mode="outlined"   
       {...props}
     />
+    <IconButton color={theme.colors.primary} icon="calendar" size={24} style={{
+          position: 'absolute',
+          top: 5,
+          left: 0,
+        }} />
     
     {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
   </View>
@@ -27,6 +33,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: 'white',
     height:40,
+    paddingLeft: 40
    
   },
   error: {

@@ -9,7 +9,7 @@ const DropDownList = ({ ...props }) => (
    
     <DropDownPicker
       style={styles.input}
-      dropDownStyle={{backgroundColor: '#fafafa'}}
+      dropDownStyle={{backgroundColor: theme.colors.primary}}
       {...props}
     />
 );
@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15, borderBottomRightRadius: 15,
     borderColor: 'gray',
     marginVertical: 5,
+    height:40
   },
   
 });

@@ -8,7 +8,6 @@ const ButtonsLogin = ({ goBack }) => (
     <View style={styles.container}>
         <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="apple" size={30} />
         <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="facebook" size={30} />
-        <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="instagram" size={30} />
         <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="google" size={30} />
     </View>
      

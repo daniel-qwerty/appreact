@@ -9,6 +9,8 @@ import WelcomeScreen               from "./screens/WelcomeScreen";
 import ForgotPassword              from "./screens/ForgotPassword";
 import Home                 from "./screens/Home";
 import FollowerProfile                 from "./screens/FollowerProfileScreen";
+import TermsConditionsScreen                 from "./screens/TermsConditionsScreen";
+import TermsServicesScreen                 from "./screens/TermsServicesScreen";
 import { theme } from './utils/theme';
 
 
@@ -31,6 +33,7 @@ const App = () => {
               <>
                 <Stack.Screen name="Home" component={Home}/>
                 <Stack.Screen name="FollowerProfile" component={FollowerProfile}/>
+                <Stack.Screen name="TermsConditions" component={TermsConditionsScreen}/>
               </>
             ) : (
               <>
@@ -38,6 +41,8 @@ const App = () => {
               <Stack.Screen name="Register" component={RegisterScreen}/>
               <Stack.Screen name="Login" component={LoginScreen}/>
               <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
+              <Stack.Screen name="TermsService" component={TermsServicesScreen}/>
+              
               </>
             )
           }

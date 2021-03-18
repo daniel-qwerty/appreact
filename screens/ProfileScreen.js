@@ -112,7 +112,7 @@ export default function RegisterScreen({navigation}) {
         placeholder="Select your Race"
         zIndex='8000'
         containerStyle={{
-        height: 70,
+        height: 50,
         width: '100%'
       }}
         onChangeItem={item => console.log(item.label, item.value)}/>
@@ -129,7 +129,7 @@ export default function RegisterScreen({navigation}) {
       ]}
         placeholder="Select your Body type"
         containerStyle={{
-        height: 70,
+        height: 50,
         width: '100%'
       }}
         zIndex='7000'
@@ -147,7 +147,7 @@ export default function RegisterScreen({navigation}) {
           }
         ]}
           containerStyle={{
-          height: 70,
+          height: 50,
           width: '50%',
           marginRight: 2
         }}
@@ -164,7 +164,7 @@ export default function RegisterScreen({navigation}) {
           }
         ]}
           containerStyle={{
-          height: 70,
+          height: 50,
           width: '50%',
           marginLeft: 2
         }}
@@ -190,7 +190,7 @@ export default function RegisterScreen({navigation}) {
               }
             ]}
               containerStyle={{
-              height: 70,
+              height: 50,
               width: '100%',
               marginLeft: 2
             }}
@@ -231,7 +231,7 @@ export default function RegisterScreen({navigation}) {
                 width: '80%'
               }}>
 
-                <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+                <TouchableOpacity onPress={() => navigation.navigate('TermsConditions')}>
                   <Text style={styles.label}>Terms and conditions</Text>
                 </TouchableOpacity>
               </View>
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginVertical: 15,
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: '600'
   },
   button: {
     marginTop: 24
