@@ -1,7 +1,6 @@
-import {StatusBar} from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, FlatList} from 'react-native';
-import {List, IconButton, Card, Icon} from 'react-native-paper';
+import {List, IconButton, Card, Surface} from 'react-native-paper';
 
 import Logo from '../components/Logo'
 import Background from '../components/Background'
@@ -102,7 +101,8 @@ export default function BillingScreen({navigation}) {
         marginHorizontal: 5,
         flex: 1
       }}>
-        <List.Item
+        <Surface style={styles.surface}>
+           <List.Item
           style={styles.itemContainer}
           title={item.date}
           description={item.description}
@@ -113,12 +113,15 @@ export default function BillingScreen({navigation}) {
           marginVertical: 10,
           marginHorizontal: 5
         }}>${item.total}</Text>}/>
+        </Surface>
+       
       </View>
 
     );
   }
 
   return (
+    
     <Background>
 
       <Header>Billing</Header>
@@ -164,7 +167,7 @@ export default function BillingScreen({navigation}) {
         )
         : ( <></>)}
 
-      <Card style={styles.cardFilter} zIndex='7000'>
+      <Card style={styles.cardFilter} zIndex={7000}>
         <Card.Content >
           <DropDownList
             items={[
@@ -180,7 +183,7 @@ export default function BillingScreen({navigation}) {
             height: 50,
             width: '100%'
           }}
-          zIndex='7000'
+          zIndex={7000}
             placeholder="Color of eyes"
             onChangeItem={item => console.log(item.label, item.value)}/>
         </Card.Content>
@@ -196,7 +199,7 @@ export default function BillingScreen({navigation}) {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         numColumns={1}
-        zIndex='6000'/>
+        zIndex={6000}/>
 
     </Background>
   );
@@ -218,6 +221,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.accent
   },
+  surface:{
+    borderRadius: 25,
+    elevation:3
+  },
   containerDatePickers: {
     flex: 1,
     flexDirection: 'row',
@@ -237,6 +244,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     height: 80,
     width: '100%',
-    backgroundColor: theme.colors.primary
+    backgroundColor: theme.colors.primary,
+     borderRadius: 25,
   }
 });

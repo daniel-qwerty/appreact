@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  Switch
+  Switch,
+  Image
 } from 'react-native';
-import {Card, Title, Paragraph, IconButton} from 'react-native-paper';
+
+import {Card, Title, Surface, IconButton} from 'react-native-paper';
 import BackgroundHome from '../components/BackgroundHome';
 import ProfileImage from '../components/ProfileImage';
 import Header from '../components/Header';
@@ -19,17 +21,22 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {descriptionValidator} from '../utils/utils';
 import {theme} from '../utils/theme'
-import { ThemeProvider } from '@react-navigation/native';
+import {ThemeProvider} from '@react-navigation/native';
 
 export default function RegisterScreen({navigation}) {
   const [description,
-    setDescription] = useState({value: '', error:''});
-  
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => {
-      setIsEnabled(previousState => !previousState);
-      console.log(!isEnabled);
-    };
+    setDescription] = useState({value: '', error: ''});
+  const [name,
+    setName] = useState('Barbie');
+  const [email,
+    setEmail] = useState('barbie13@gmail.com');
+
+  const [isEnabled,
+    setIsEnabled] = useState(false);
+  const toggleSwitch = () => {
+    setIsEnabled(previousState => !previousState);
+    console.log(!isEnabled);
+  };
 
   const [date,
     setDate] = useState(new Date());
@@ -58,25 +65,20 @@ export default function RegisterScreen({navigation}) {
     hideDatePicker();
   };
 
-  
-
   const _onSignUpPressed = () => {
     const descriptionError = descriptionValidator(description.value);
-    
 
     if (descriptionError) {
       setDescription({
         ...description,
         error: descriptionError
       });
-      
+
       return;
     }
 
     //navigation.navigate('Dashboard');
   };
-
-
 
   return (
 
@@ -84,10 +86,41 @@ export default function RegisterScreen({navigation}) {
 
       <Header>Profile</Header>
 
-      <ProfileImage
-        source={{
-        uri: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
-      }}/>
+      <View style={styles.headerContainer}>
+        <View style={styles.userRow}>
+          <Surface style={styles.userImageSurface}>
+              <ProfileImage
+              style={styles.userImage}
+              source={{
+              uri: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
+            }}/>
+          </Surface>
+         
+          <View style={styles.userNameRow}>
+            <Text style={styles.userNameText}>{name}</Text>
+          </View>
+          <View style={styles.userBioRow}>
+            <Text style={styles.userBioText}>{email}</Text>
+          </View>
+        </View>
+        <View style={styles.socialRow}>
+          <Surface style={styles.socialIcon}>
+            <Text style={styles.numberText}>23</Text>
+            <Text style={styles.numberTitle}>Following</Text>
+          </Surface>
+         
+          <Surface style={styles.socialIcon}>
+            <Text style={styles.numberText}>54</Text>
+            <Text style={styles.numberTitle}>Likes</Text>
+          </Surface>
+         
+          <Surface style={styles.socialIcon}>
+            <Text style={styles.numberText}>3</Text>
+            <Text style={styles.numberTitle}>Lives</Text>
+          </Surface>
+         
+        </View>
+      </View>
 
       <TextInput
         label="Description"
@@ -110,7 +143,7 @@ export default function RegisterScreen({navigation}) {
         }
       ]}
         placeholder="Select your Race"
-        zIndex='8000'
+        zIndex={8000}
         containerStyle={{
         height: 50,
         width: '100%'
@@ -132,10 +165,10 @@ export default function RegisterScreen({navigation}) {
         height: 50,
         width: '100%'
       }}
-        zIndex='7000'
+        zIndex={7000}
         onChangeItem={item => console.log(item.label, item.value)}/>
 
-      <View style={styles.twoDrops} zIndex='6000'>
+      <View style={styles.twoDrops} zIndex={6000}>
         <DropDownList
           items={[
           {
@@ -175,8 +208,8 @@ export default function RegisterScreen({navigation}) {
 
       <View style={{
         width: '100%'
-      }}>
-        <Card style={styles.card}>
+      }} zIndex={5000}>
+        <Card style={styles.card} >
           <Card.Title title="Be live for 24 hrs"/>
           <Card.Content>
             <DropDownList
@@ -195,7 +228,7 @@ export default function RegisterScreen({navigation}) {
               marginLeft: 2
             }}
               placeholder="Facility"
-              zIndex='10000'
+              zIndex={10000}
               onChangeItem={item => console.log(item.label, item.value)}/>
             <View style={styles.containerDatePickers}>
               <View style={{
@@ -206,8 +239,7 @@ export default function RegisterScreen({navigation}) {
                   label="Date"
                   returnKeyType="next"
                   value={date.toLocaleString()}
-                  editable={false}
-                  />
+                  editable={false}/>
               </View>
               <DateTimePickerModal
                 isVisible={isDatePickerVisible}
@@ -222,7 +254,11 @@ export default function RegisterScreen({navigation}) {
                 justifyContent: 'center',
                 flex: 1
               }}>
-                <IconButton color={theme.colors.primary} icon="calendar" size={40} onPress={showDatePicker}/>
+                <IconButton
+                  color={theme.colors.primary}
+                  icon="calendar"
+                  size={40}
+                  onPress={showDatePicker}/>
               </View>
             </View>
 
@@ -258,7 +294,11 @@ export default function RegisterScreen({navigation}) {
               </View>
             </View>
 
-            <Button disabled={!isEnabled} mode="contained" onPress={_onSignUpPressed} style={styles.button}>
+            <Button
+              disabled={!isEnabled}
+              mode="contained"
+              onPress={_onSignUpPressed}
+              style={styles.button}>
               Pay
             </Button>
           </Card.Content>
@@ -313,5 +353,73 @@ const styles = StyleSheet.create({
   },
   card: {
     marginVertical: 10
-  }
+  },
+
+  userBioRow: {
+    marginLeft: 40,
+    marginRight: 40
+  },
+  userBioText: {
+    color: theme.colors.accent,
+    fontSize: 13.5,
+    textAlign: 'center'
+  },
+  userImage: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: 10,
+    width: 120
+  },
+  userImageSurface: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: 10,
+    width: 120,
+    elevation: 5
+  },
+  userNameRow: {
+    marginBottom: 10
+  },
+  userNameText: {
+    color: theme.colors.accent,
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  userRow: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginBottom: 12
+  },
+  socialIcon: {
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+    width: 100,
+    elevation:5
+  },
+  socialRow: {
+    flexDirection: 'row',
+    marginVertical:10
+  },
+  numberText: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: 'white'
+  },
+  numberTitle: {
+    textAlign: 'center',
+    color: 'white'
+  },
+  headerContainer: {
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    marginBottom: 10,
+    marginTop: 20
+  },
+  
 });

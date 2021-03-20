@@ -1,13 +1,14 @@
 import React, {memo} from 'react';
 import {ImageBackground, StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-//  let Props = {   children: React.ReactNode };
+import {StatusBar} from 'expo-status-bar';
 
 const Background = ({children, Props}) => (
   <ImageBackground
     source={require('../assets/images/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}>
+    <StatusBar style="dark" />
     <SafeAreaView style={{
       height: '100%'
     }}>

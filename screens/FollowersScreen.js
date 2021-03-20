@@ -9,12 +9,12 @@ import {
   Image,
   TouchableOpacity
 } from 'react-native';
-
+import {Surface} from 'react-native-paper';
 import Background from '../components/Background'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Botton'
 import Header from '../components/Header'
-import { theme } from '../utils/theme';
+import {theme} from '../utils/theme';
 
 export default function FollowersScreen({navigation}) {
   const picsumImages = new Array(11).fill("http://placeimg.com/640/360/any");
@@ -32,12 +32,17 @@ export default function FollowersScreen({navigation}) {
         marginHorizontal: 5,
         flex: 1 / numColumns
       }}>
-         <TouchableOpacity onPress={() => navigation.navigate('FollowerProfile')}>
-            <Image source={{
-          uri: item
-        }} style={styles.renderItemImage}/>
-         </TouchableOpacity>
-       
+        <TouchableOpacity onPress={() => navigation.navigate('FollowerProfile')}>
+          <Surface style={styles.surface}>
+            <Image
+              source={{
+              uri: item
+            }}
+              style={styles.renderItemImage}/>
+          </Surface>
+
+        </TouchableOpacity>
+
         <Text style={styles.renderItemText}>James Bond</Text>
       </View>
 
@@ -52,7 +57,7 @@ export default function FollowersScreen({navigation}) {
         style={{
         height: '100%',
         width: '100%',
-        marginHorizontal: 10,
+        marginHorizontal: 10
       }}
         data={images}
         renderItem={renderItem}
@@ -73,13 +78,17 @@ const styles = StyleSheet.create({
   rederItem: {},
   renderItemImage: {
     aspectRatio: 1,
-    borderRadius: 25,
+    borderRadius: 50,
     borderColor: theme.colors.primary,
-    borderWidth:2
+    borderWidth: 2
   },
   renderItemText: {
     marginHorizontal: 10,
     marginVertical: 5,
-    width:'100%'
-  }
+    width: '100%'
+  },
+  surface:{
+    borderRadius: 50,
+    elevation:4
+  },
 });

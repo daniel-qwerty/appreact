@@ -15,10 +15,10 @@ const TextInputForDate = ({ errorText, ...props }) => (
       mode="outlined"   
       {...props}
     />
-    <IconButton color={theme.colors.primary} icon="calendar" size={24} style={{
+    <IconButton color={theme.colors.primary} icon="calendar" size={30} style={{
           position: 'absolute',
-          top: 5,
-          left: 0,
+          top: 0,
+          right: 0,
         }} />
     
     {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: 'white',
     height:40,
-    paddingLeft: 40
+    paddingRight: 50
    
   },
   error: {

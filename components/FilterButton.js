@@ -12,7 +12,7 @@ const FilterButton = ({ Press }) => (
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 10 + getStatusBarHeight(),
+    top: 10,
     right: 0,
   },
   image: {
