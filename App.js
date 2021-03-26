@@ -11,40 +11,47 @@ import Home                 from "./screens/Home";
 import FollowerProfile                 from "./screens/FollowerProfileScreen";
 import TermsConditionsScreen                 from "./screens/TermsConditionsScreen";
 import TermsServicesScreen                 from "./screens/TermsServicesScreen";
+import ChatScreen                 from "./screens/ChatScreen";
 import AccountScreen  from "./screens/AccountScreen";
 import { theme } from './utils/theme';
+import defaultData from './auth/defaultData'
+import AuthContext from './auth/context'
 
 
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [isSignedIn, setIsSignedIn] = useState(true)
+  const [isSignedIn, setIsSignedIn] = useState(false)
+  const [authData, setAuthData] = useState(defaultData)
 
   return (
     <PaperProvider theme={theme}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome" screenOptions={{headerShown: false}}>
-          {
-            isSignedIn ? (
-              <>
-                <Stack.Screen name="Home" component={Home}/>
-                <Stack.Screen name="FollowerProfile" component={FollowerProfile}/>
-                <Stack.Screen name="TermsConditions" component={TermsConditionsScreen}/>
-                <Stack.Screen name="Account" component={AccountScreen}/>
-              </>
-            ) : (
-              <>
-              <Stack.Screen name="Welcome" component={WelcomeScreen}/>
-              <Stack.Screen name="Register" component={RegisterScreen}/>
-              <Stack.Screen name="Login" component={LoginScreen}/>
-              <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
-              <Stack.Screen name="TermsService" component={TermsServicesScreen}/>
-              
-              </>
-            )
-          }
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AuthContext.Provider value={{authData, setAuthData}}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Welcome" screenOptions={{headerShown: false}}>
+            {
+              authData.islogged ? (
+                <>
+                  <Stack.Screen name="Home" component={Home}/>
+                  <Stack.Screen name="FollowerProfile" component={FollowerProfile}/>
+                  <Stack.Screen name="TermsConditions" component={TermsConditionsScreen}/>
+                  <Stack.Screen name="Account" component={AccountScreen}/>
+                  <Stack.Screen name="Chat" component={ChatScreen}/>
+                </>
+              ) : (
+                <>
+                <Stack.Screen name="Welcome" component={WelcomeScreen}/>
+                <Stack.Screen name="Register" component={RegisterScreen}/>
+                <Stack.Screen name="Login" component={LoginScreen}/>
+                <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
+                <Stack.Screen name="TermsService" component={TermsServicesScreen}/>
+                </>
+              )
+            }
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AuthContext.Provider>
+      
     </PaperProvider>
   );
 }

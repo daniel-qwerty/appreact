@@ -95,7 +95,7 @@ export default function AccountScreen({navigation}) {
         ? dateBirth.toLocaleDateString("en-US")
         : ''}
         editable={true}
-        onFocus={showDatePickerFrom}/>
+        />
 
       <TextInput
         label="Email"

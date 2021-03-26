@@ -1,5 +1,5 @@
 import {StatusBar} from 'expo-status-bar';
-import React from 'react';
+import React , {useContext}   from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import {IconButton, Surface} from 'react-native-paper';
 
@@ -9,8 +9,11 @@ import Paragraph from '../components/Paragraph'
 import Button from '../components/Botton'
 import Header from '../components/Header'
 import {theme} from '../utils/theme'
+import AuthContext from '../auth/context'
 
 export default function SettingsScreen({navigation}) {
+
+  const {authData, setAuthData} = useContext(AuthContext)
 
   var data = [
     {
@@ -27,27 +30,51 @@ export default function SettingsScreen({navigation}) {
       "id": 3,
       "name": "Logout",
       "icon": "logout",
-      "to": "url"
+      "to": "logout"
     }
   ];
+
+  const logOutAuth = () => {
+    setAuthData({
+      ...authData, 
+      islogged: false
+    })
+  };
 
   function renderItem(data) {
     let {item, index} = data;
 
     return (
+       
       <View style={styles.itemBlock}>
-        <TouchableOpacity onPress={() => navigation.navigate(item.to)}>
-           <IconButton icon={item.icon} color='white' size={30}/>
-        </TouchableOpacity>
-            
-        <View style={styles.itemMeta}>
-          <TouchableOpacity  onPress={() => navigation.navigate(item.to)}>
-          <Text style={styles.itemName}>{item.name}</Text>
+        {
+          item.to === 'logout' ? (
+            <>
+            <TouchableOpacity onPress={logOutAuth}>
+               <IconButton icon={item.icon} color='white' size={30}/>
             </TouchableOpacity>
-        </View>
-       
+            
+            <View style={styles.itemMeta}>
+              <TouchableOpacity  onPress={logOutAuth}>
+                <Text style={styles.itemName}>{item.name}</Text>
+              </TouchableOpacity>
+            </View>
+            </>
+          ) :(
+            <>
+            <TouchableOpacity onPress={() => navigation.navigate(item.to)}>
+              <IconButton icon={item.icon} color='white' size={30}/>
+            </TouchableOpacity>
+            
+            <View style={styles.itemMeta}>
+              <TouchableOpacity  onPress={() => navigation.navigate(item.to)}>
+                <Text style={styles.itemName}>{item.name}</Text>
+              </TouchableOpacity>
+            </View>
+            </>
+          )
+       }
         
-       
       </View>
     )
   }

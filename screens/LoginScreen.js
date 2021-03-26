@@ -1,6 +1,7 @@
 import {StatusBar}              from 'expo-status-bar';
-import React                    from 'react';
+import React, {useContext, useState}                    from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {Snackbar } from 'react-native-paper';
 
 
 import Logo from '../components/Logo'
@@ -10,20 +11,60 @@ import Button from '../components/Botton'
 import Header from '../components/Header'
 import TextInput from '../components/TextInput'
 import ButtonsLogin from '../components/ButtonsLogin'
+import AuthContext from '../auth/context'
+import {
+  emailValidator,
+  passwordValidator,
+  nameValidator,
+} from '../utils/utils';
 
 export default function LoginScreen({ navigation }) {
+
+  const [email, setEmail] = useState({ value: '', error: '' });
+  const [password, setPassword] = useState({ value: '', error: '' });
+  const [snackBarVisible, setSnackBarVisible] = useState(false);
+
+  const {authData, setAuthData} = useContext(AuthContext)
+  const onDismissSnackBar = () => setSnackBarVisible(false);
+
+  const loginAuth = () => {
+    setAuthData({
+      ...authData, 
+      islogged: true
+    })
+  };
+
+  const _checkUser = () => {
+    const emailError = emailValidator(email.value);
+    const passwordError = passwordValidator(password.value);
+
+    if (emailError || passwordError) {
+      setEmail({ ...email, error: emailError });
+      setPassword({ ...password, error: passwordError });
+      return;
+    }
+    console.log(email.value);
+    if(email.value === 'barbie@gmail.com' && password.value === '123456'){
+      loginAuth();
+    } else {
+      setSnackBarVisible(!snackBarVisible)
+    }
+
     
-  
+  };
 
   return (
      <Background>
       <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo />
-      <Header>Enterteiner</Header>
+      <Header>Enterteiner {authData.user.name} </Header>
       <TextInput
         label="Email"
         returnKeyType="next"
-        value=""
+        value={email.value}
+        onChangeText={text => setEmail({ value: text, error: '' })}
+        error={!!email.error}
+        errorText={email.error}
         autoCapitalize="none"
         autoCompleteType="email"
         textContentType="emailAddress"
@@ -32,7 +73,10 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         label="Password"
         returnKeyType="done"
-        value=""
+        value={password.value}
+        onChangeText={text => setPassword({ value: text, error: '' })}
+        error={!!password.error}
+        errorText={password.error}
         secureTextEntry
       />
 
@@ -44,17 +88,31 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <Button mode="contained" onPress={() => navigation.navigate('Home')} >
+      <Button mode="contained" onPress={_checkUser} >
         Login
       </Button>
       <Text style={styles.label}> Or </Text>
-      <ButtonsLogin goBack={() => navigation.navigate('Home')}/>
+      <ButtonsLogin onPress={loginAuth}  />
       <View style={styles.row}>
         <Text style={styles.label}>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
           <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
       </View>
+
+       <Snackbar
+        visible={snackBarVisible}
+        onDismiss={onDismissSnackBar}
+        duration={5000}
+        action={{
+          label: 'Undo',
+          onPress: () => {
+            // Do something
+            console.log('object');
+          },
+        }}>
+        Email or password Incorrect
+      </Snackbar>
     </Background>
   );
 }

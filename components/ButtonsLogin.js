@@ -2,13 +2,13 @@ import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { IconButton, Colors } from 'react-native-paper';
 
-const ButtonsLogin = ({ goBack }) => (
+const ButtonsLogin = ({ ...props }) => (
   <View>
     
     <View style={styles.container}>
-        <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="apple" size={30} />
-        <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="facebook" size={30} />
-        <IconButton onPress={goBack} style={styles.iconButton} color={Colors.white} icon="google" size={30} />
+        <IconButton {...props} style={styles.iconButton} color={Colors.white} icon="apple" size={30} />
+        <IconButton {...props} style={styles.iconButton} color={Colors.white} icon="facebook" size={30} />
+        <IconButton {...props} style={styles.iconButton} color={Colors.white} icon="google" size={30} />
     </View>
      
   </View>

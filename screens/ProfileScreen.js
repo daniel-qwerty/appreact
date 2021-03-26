@@ -398,12 +398,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderRadius: 10,
-    width: 100,
+    width: '33.333%',
     elevation:5
   },
   socialRow: {
     flexDirection: 'row',
-    marginVertical:10
+    marginVertical:10,     
   },
   numberText: {
     fontSize: 20,
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
     marginBottom: 10,
-    marginTop: 20
+    marginTop: 20,    
   },
   
 });

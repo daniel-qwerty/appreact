@@ -57,7 +57,7 @@ export default function FollowersScreen({navigation}) {
         style={{
         height: '100%',
         width: '100%',
-        marginHorizontal: 10
+      
       }}
         data={images}
         renderItem={renderItem}
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     borderWidth: 2
   },
   renderItemText: {
-    marginHorizontal: 10,
+    marginHorizontal: 0,
     marginVertical: 5,
     width: '100%'
   },

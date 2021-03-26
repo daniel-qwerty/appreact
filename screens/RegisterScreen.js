@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -7,6 +7,7 @@ import Button from '../components/Botton';
 import TextInput from '../components/TextInput';
 import BackButton from '../components/BackButton';
 import ButtonsLogin from '../components/ButtonsLogin'
+import AuthContext from '../auth/context'
 import {
   emailValidator,
   passwordValidator,
@@ -17,6 +18,14 @@ export default function RegisterScreen({navigation}) {
   const [name, setName] = useState({ value: '', error: '' });
   const [email, setEmail] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
+   const {authData, setAuthData} = useContext(AuthContext)
+  
+  const RegisterUser = () => {
+    setAuthData({
+      ...authData, 
+      islogged: true
+    })
+  };
 
   const _onSignUpPressed = () => {
     const nameError = nameValidator(name.value);
@@ -30,7 +39,7 @@ export default function RegisterScreen({navigation}) {
       return;
     }
 
-    navigation.navigate('Dashboard');
+    RegisterUser();
   };
 
   return (
@@ -77,7 +86,7 @@ export default function RegisterScreen({navigation}) {
         Sign Up
       </Button>
       <Text style={styles.label}> Or </Text>
-      <ButtonsLogin/>
+      <ButtonsLogin onPress={RegisterUser}  />
       <View style={styles.row}>
         <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
