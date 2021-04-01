@@ -9,19 +9,20 @@ import {
   Image
 } from 'react-native';
 
-import {Card, Title, Surface, IconButton} from 'react-native-paper';
+import {Card, Title, Surface, IconButton, Appbar} from 'react-native-paper';
 import BackgroundHome from '../components/BackgroundHome';
 import ProfileImage from '../components/ProfileImage';
 import Header from '../components/Header';
 import Button from '../components/Botton';
 import TextInput from '../components/TextInput';
 import DropDownList from '../components/DropDownList';
+import OnlyFansButton from '../components/OnlyFansButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {descriptionValidator} from '../utils/utils';
 import {theme} from '../utils/theme'
-import {ThemeProvider} from '@react-navigation/native';
+import * as WebBrowser from 'expo-web-browser';
 
 export default function RegisterScreen({navigation}) {
   const [description,
@@ -76,26 +77,31 @@ export default function RegisterScreen({navigation}) {
 
       return;
     }
-
     //navigation.navigate('Dashboard');
+  };
+
+   _handleOpenWithWebBrowser = () => {
+    WebBrowser.openBrowserAsync('https://www.onlyfans.com');
   };
 
   return (
 
     <BackgroundHome>
 
-      <Header>Profile</Header>
+      <OnlyFansButton Press={this._handleOpenWithWebBrowser}/>
+
+      
 
       <View style={styles.headerContainer}>
         <View style={styles.userRow}>
           <Surface style={styles.userImageSurface}>
-              <ProfileImage
+            <ProfileImage
               style={styles.userImage}
               source={{
               uri: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
             }}/>
           </Surface>
-         
+
           <View style={styles.userNameRow}>
             <Text style={styles.userNameText}>{name}</Text>
           </View>
@@ -103,24 +109,53 @@ export default function RegisterScreen({navigation}) {
             <Text style={styles.userBioText}>{email}</Text>
           </View>
         </View>
-        <View style={styles.socialRow}>
+        {/* <View style={styles.socialRow}>
           <Surface style={styles.socialIcon}>
             <Text style={styles.numberText}>23</Text>
             <Text style={styles.numberTitle}>Following</Text>
           </Surface>
-         
+
           <Surface style={styles.socialIcon}>
             <Text style={styles.numberText}>54</Text>
             <Text style={styles.numberTitle}>Likes</Text>
           </Surface>
-         
+
           <Surface style={styles.socialIcon}>
             <Text style={styles.numberText}>3</Text>
             <Text style={styles.numberTitle}>Lives</Text>
           </Surface>
-         
-        </View>
+
+        </View> */}
       </View>
+
+      <View style={styles.containerDatePickers}>
+              <View style={{
+                width: '80%'
+              }}>
+                  <Text style={styles.label}>Availability</Text>
+              </View>
+
+              <View
+                style={{
+                width: '20%',
+                alignSelf: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1
+              }}>
+                <Switch
+                  trackColor={{
+                  false: "#767577",
+                  true: "#767577"
+                }}
+                  thumbColor={isEnabled
+                  ? theme.colors.primary
+                  : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleSwitch}
+                  value={isEnabled}/>
+              </View>
+            </View>
 
       <TextInput
         label="Description"
@@ -168,45 +203,29 @@ export default function RegisterScreen({navigation}) {
         zIndex={7000}
         onChangeItem={item => console.log(item.label, item.value)}/>
 
-      <View style={styles.twoDrops} zIndex={6000}>
-        <DropDownList
-          items={[
-          {
-            label: 'Item 4',
-            value: 'item5'
-          }, {
-            label: 'Item 5',
-            value: 'item6'
-          }
-        ]}
-          containerStyle={{
-          height: 50,
-          width: '50%',
-          marginRight: 2
-        }}
-          placeholder="Color of hair"
-          onChangeItem={item => console.log(item.label, item.value)}/>
-        <DropDownList
-          items={[
-          {
-            label: 'Item 4',
-            value: 'item5'
-          }, {
-            label: 'Item 5',
-            value: 'item6'
-          }
-        ]}
-          containerStyle={{
-          height: 50,
-          width: '50%',
-          marginLeft: 2
-        }}
-          placeholder="Color of eyes"
-          onChangeItem={item => console.log(item.label, item.value)}/>
+      <DropDownList
+        items={[
+        {
+          label: 'Item 4',
+          value: 'item5'
+        }, {
+          label: 'Item 5',
+          value: 'item6'
+        }
+      ]}
+        containerStyle={{
+        height: 50,
+        width: '100%',
+        marginRight: 2
+      }}
+        placeholder="Color of hair"
+        onChangeItem={item => console.log(item.label, item.value)}/>
 
-      </View>
+      <Button mode="contained" onPress={_onSignUpPressed} style={styles.button}>
+        Save
+      </Button>
 
-      <View style={{
+      {/* <View style={{
         width: '100%'
       }} zIndex={5000}>
         <Card style={styles.card} >
@@ -304,7 +323,7 @@ export default function RegisterScreen({navigation}) {
           </Card.Content>
 
         </Card>
-      </View>
+      </View> */}
 
       {/* <Text style={styles.label}> Or </Text>
       <ButtonsLogin/>
@@ -319,7 +338,7 @@ export default function RegisterScreen({navigation}) {
 
 const styles = StyleSheet.create({
   label: {
-    textAlign: 'left',
+    textAlign: 'right',
     width: '100%',
     marginVertical: 15,
     fontSize: 16,
@@ -399,11 +418,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     width: '33.333%',
-    elevation:5
+    elevation: 5
   },
   socialRow: {
     flexDirection: 'row',
-    marginVertical:10,     
+    marginVertical: 10
   },
   numberText: {
     fontSize: 20,
@@ -417,9 +436,8 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: 'transparent',
     marginBottom: 10,
-    marginTop: 20,    
-  },
-  
+    marginTop: 50
+  }
 });

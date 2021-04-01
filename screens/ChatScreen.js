@@ -144,13 +144,8 @@ export default class Chat extends Component {
 
   render() {
     return (
-      <SafeAreaView style={{
-        height: '100%'
-      }}>
-        <Appbar style={styles.bottom}>
-          <Appbar.BackAction onPress={() => this.props.navigation.goBack()}/>
-          <Appbar.Content title="Jhon Doe"/>
-        </Appbar>
+     
+      
 
         <View style={{
           flex: 1
@@ -178,7 +173,7 @@ export default class Chat extends Component {
             </View>
           </KeyboardAvoidingView>
         </View>
-      </SafeAreaView>
+    
 
     );
   }

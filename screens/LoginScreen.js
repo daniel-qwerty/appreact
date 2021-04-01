@@ -1,8 +1,9 @@
 import {StatusBar}              from 'expo-status-bar';
-import React, {useContext, useState}                    from 'react';
+import React, {useContext, useState, useEffect}                    from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import {Snackbar } from 'react-native-paper';
-
+import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 import Logo from '../components/Logo'
 import Background from '../components/Background'
@@ -23,6 +24,8 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
   const [snackBarVisible, setSnackBarVisible] = useState(false);
+   const [scanned, SetScanned] = useState(false);
+   const [haveKeychain, SetHaveKeychain] = useState(false);
 
   const {authData, setAuthData} = useContext(AuthContext)
   const onDismissSnackBar = () => setSnackBarVisible(false);
@@ -43,21 +46,82 @@ export default function LoginScreen({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-    console.log(email.value);
+
     if(email.value === 'barbie@gmail.com' && password.value === '123456'){
+      save('entertainer', JSON.stringify({email: email.value, password: password.value}));
+      SetScanned(true);
       loginAuth();
     } else {
       setSnackBarVisible(!snackBarVisible)
     }
-
-    
   };
+
+  async function save(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
+
+  async function checkStoreKeyChain(key) {
+    let result = await SecureStore.getItemAsync(key);
+       console.log(result);
+    if (result) {
+      // alert("🔐 Here's your value 🔐 \n" + result.email);
+      SetHaveKeychain(true);
+        if(!scanned)
+          checkDeviceForHardware();
+    } else {
+      SetHaveKeychain(false);
+      //alert('No credentials of entertainer stored in the keychian, please login manually');
+    }
+  }
+
+  async function  checkDeviceForHardware() {
+    let compatible = await LocalAuthentication.hasHardwareAsync();
+      if (compatible) {
+        //alert('Compatible Device!');
+        checkForBiometrics();
+      }
+      else alert('Current device does not have the necessary hardware!')
+  }
+
+  async function  checkForBiometrics() {
+   let biometricRecords = await LocalAuthentication.isEnrolledAsync();
+    if (!biometricRecords) {
+    alert('No Biometrics Found')
+    } 
+    else {
+    //alert('Biometrics Found')
+    if(!scanned)
+       handleLoginPress();
+    }
+  }
+
+  async function handleLoginPress() {
+    handleAuthentication();
+  };
+
+  async function handleAuthentication() {
+     let result = await LocalAuthentication.authenticateAsync();
+     if (result.success) {
+      //getValueFor('entertainer');
+      if(haveKeychain){
+        SetScanned(true);
+        loginAuth();
+      }
+     }
+  };
+
+   useEffect(() => {
+    checkStoreKeyChain('entertainer');
+  
+    //  let result =  SecureStore.deleteItemAsync('entertainer');
+    //  console.log(result);
+  });
 
   return (
      <Background>
       <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo />
-      <Header>Enterteiner {authData.user.name} </Header>
+      <Header>Enterteiner</Header>
       <TextInput
         label="Email"
         returnKeyType="next"

@@ -5,7 +5,7 @@ import {StatusBar} from 'expo-status-bar';
 
 const Background = ({children, Props}) => (
   <ImageBackground
-    source={require('../assets/images/background_dot.png')}
+    // source={require('../assets/images/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}>
     <StatusBar style="dark" />

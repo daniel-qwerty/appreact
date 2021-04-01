@@ -5,7 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 const BackgroundHome = ({children, Props}) => (
   <ImageBackground
-    source={require('../assets/images/background_dot.png')}
+    // source={require('../assets/images/background_dot.png')}
     resizeMode="repeat"
     style={styles.background}>
     <SafeAreaView style={{

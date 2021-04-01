@@ -11,6 +11,7 @@ import Header from '../components/Header'
 import {theme} from '../utils/theme'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DropDownList from '../components/DropDownList';
+import BackButton from '../components/BackButton';
 
 export default function BillingScreen({navigation}) {
 
@@ -123,6 +124,8 @@ export default function BillingScreen({navigation}) {
   return (
     
     <Background>
+
+      <BackButton goBack={() => navigation.goBack()}/>
 
       <Header>Billing</Header>
 

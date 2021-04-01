@@ -17,6 +17,7 @@ import {
 export default function RegisterScreen({navigation}) {
   const [name, setName] = useState({ value: '', error: '' });
   const [email, setEmail] = useState({ value: '', error: '' });
+  const [phone, setPhone] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
    const {authData, setAuthData} = useContext(AuthContext)
   
@@ -70,6 +71,19 @@ export default function RegisterScreen({navigation}) {
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
+      />
+
+      <TextInput
+        label="Phone"
+        returnKeyType="next"
+        value={phone.value}
+        onChangeText={text => setPhone({ value: text, error: '' })}
+        error={!!phone.error}
+        errorText={phone.error}
+        autoCapitalize="none"
+        autoCompleteType="tel"
+        textContentType="telephoneNumber"
+        keyboardType="default"
       />
 
       <TextInput

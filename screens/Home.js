@@ -8,11 +8,15 @@ import DirectMessagesScreen from "./DirectMessagesScreen";
 import FollowersScreen from "./FollowersScreen";
 import BillingScreen from "./BillingScreen";
 import SettingsScreen from "./SettingsScreen";
+import MapScreen from "./MapScreen";
+import FollowerProfileScreen from "./FollowerProfileScreen";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {theme} from '../utils/theme';
 
-export default function App() {
+export default function App({navigation}) {
   const Tab = createMaterialBottomTabNavigator();
+
+ 
 
   return (
     <Tab.Navigator
@@ -23,33 +27,28 @@ export default function App() {
       backgroundColor: theme.colors.primary
     }}>
       <Tab.Screen
+        name="Home"
+        component={MapScreen}
+        options={{
+        tabBarLabel: 'Home',
+        tabBarIcon: ({color}) => (<MaterialCommunityIcons name="home" color={color} size={26}/>)
+      }}/>
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
         tabBarLabel: 'Profile',
         tabBarIcon: ({color}) => (<MaterialCommunityIcons name="account" color={color} size={26}/>)
       }}/>
-      <Tab.Screen
-        name="Followers"
-        component={FollowersScreen}
-        options={{
-        tabBarLabel: 'Followers',
-        tabBarIcon: ({color}) => (<MaterialCommunityIcons name="account-group-outline" color={color} size={26}/>)
-      }}/>
-      <Tab.Screen
-        name="Billing"
-        component={BillingScreen}
-        options={{
-        tabBarLabel: 'Billing',
-        tabBarIcon: ({color}) => (<MaterialCommunityIcons name="cash-multiple" color={color} size={26}/>)
-      }}/>
-       <Tab.Screen
+    
+     
+       {/* <Tab.Screen
         name="DM"
         component={DirectMessagesScreen}
         options={{
         tabBarLabel: 'Messages',
         tabBarIcon: ({color}) => (<MaterialCommunityIcons name="cellphone-message" color={color} size={26}/>)
-      }}/>
+      }}/> */}
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}

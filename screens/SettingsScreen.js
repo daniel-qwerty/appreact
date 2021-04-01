@@ -21,13 +21,20 @@ export default function SettingsScreen({navigation}) {
       "name": "My Account",
       "icon": "account",
       "to": "Account"
-    }, {
+    },
+    {
       "id": 2,
+      "name": "My Billing",
+      "icon": "cash-multiple",
+      "to": "Billing"
+    },
+     {
+      "id": 3,
       "name": "Help",
       "icon": "lifebuoy",
       "to": "url"
     }, {
-      "id": 3,
+      "id": 4,
       "name": "Logout",
       "icon": "logout",
       "to": "logout"

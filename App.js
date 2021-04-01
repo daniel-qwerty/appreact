@@ -13,6 +13,8 @@ import TermsConditionsScreen                 from "./screens/TermsConditionsScre
 import TermsServicesScreen                 from "./screens/TermsServicesScreen";
 import ChatScreen                 from "./screens/ChatScreen";
 import AccountScreen  from "./screens/AccountScreen";
+import BillingScreen  from "./screens/BillingScreen";
+import TableScreen  from "./screens/TableScreen";
 import { theme } from './utils/theme';
 import defaultData from './auth/defaultData'
 import AuthContext from './auth/context'
@@ -37,6 +39,8 @@ const App = () => {
                   <Stack.Screen name="TermsConditions" component={TermsConditionsScreen}/>
                   <Stack.Screen name="Account" component={AccountScreen}/>
                   <Stack.Screen name="Chat" component={ChatScreen}/>
+                  <Stack.Screen name="Billing" component={BillingScreen}/>
+                  <Stack.Screen name="Table" component={TableScreen}/>
                 </>
               ) : (
                 <>
