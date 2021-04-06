@@ -10,7 +10,7 @@ export default function TermsCoditionsScreen({navigation}) {
     <BackgroundHome>
       <BackButton goBack={() => navigation.goBack()}/>
       <View style={styles.container}>
-        <Header>Terms and Conditions</Header>
+        <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Terms and Conditions</Text>
 
         <Text style={styles.paragraphText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu

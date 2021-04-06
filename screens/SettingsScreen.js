@@ -18,23 +18,29 @@ export default function SettingsScreen({navigation}) {
   var data = [
     {
       "id": 1,
-      "name": "My Account",
+      "name": "My Profile",
       "icon": "account",
-      "to": "Account"
+      "to": "Profile"
     },
     {
       "id": 2,
+      "name": "My Account",
+      "icon": "account-box",
+      "to": "Account"
+    },
+    {
+      "id": 3,
       "name": "My Billing",
       "icon": "cash-multiple",
       "to": "Billing"
     },
      {
-      "id": 3,
+      "id": 4,
       "name": "Help",
       "icon": "lifebuoy",
       "to": "url"
     }, {
-      "id": 4,
+      "id": 5,
       "name": "Logout",
       "icon": "logout",
       "to": "logout"
@@ -93,7 +99,7 @@ export default function SettingsScreen({navigation}) {
   return (
     <Background>
       <Logo></Logo>
-      <Header>Settings</Header>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Settings</Text>
       <Surface style={styles.surface}>
         <FlatList
           style={{}}
@@ -136,7 +142,7 @@ const styles = StyleSheet.create({
   },
   surface: {
     backgroundColor: theme.colors.primary,
-    width: '100%',
+    width: '85%',
     height: 'auto',
     elevation: 6,
     borderRadius: 15

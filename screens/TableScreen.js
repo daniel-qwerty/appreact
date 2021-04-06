@@ -5,6 +5,7 @@ import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import {theme} from "../utils/theme";
 import {Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import BackButton from '../components/BackButton';
 
 import Logo from '../components/Logo'
 import Background from '../components/Background'
@@ -23,11 +24,12 @@ export default function TableScreen({route, navigation}) {
     <SafeAreaView style={{
       height: '100%'
     }}>
+      
       <View style={styles.container}>
-        <Appbar style={styles.bottom}>
-          <Appbar.BackAction onPress={() => navigation.goBack()}/>
-        </Appbar>
-        <View style={styles.header}></View>
+     
+        <View style={styles.header}>
+             <BackButton  goBack={() => navigation.goBack()}/>
+        </View>
         <Image
           style={styles.avatar}
           source={{
@@ -55,7 +57,8 @@ export default function TableScreen({route, navigation}) {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: theme.colors.primary,
-    height: 50
+    height: 100,
+    paddingHorizontal:20
   },
   avatar: {
     width: 130,

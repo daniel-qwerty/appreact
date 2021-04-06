@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View } from 'react-native';
 import { emailValidator } from '../utils/utils';
 import Background from '../components/Background';
 import BackButton from '../components/BackButton';
@@ -26,11 +26,13 @@ export default function RegisterScreen({navigation}) {
 
   return (
    <Background>
-      <BackButton goBack={() => navigation.navigate('Login')} />
+      
+      <View style={styles.container}>
+       <BackButton goBack={() => navigation.navigate('Login')} />
 
       <Logo />
 
-      <Header>Restore Password</Header>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Restore Password</Text>
 
       <TextInput
         label="E-mail address"
@@ -48,6 +50,8 @@ export default function RegisterScreen({navigation}) {
       <Button mode="contained" onPress={_onSendPressed} style={styles.button}>
         Send Reset Instructions
       </Button>
+      </View>
+      
 
     
     </Background>
@@ -55,6 +59,12 @@ export default function RegisterScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
+   container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+      height:'100%'
+    },
   back: {
     width: '100%',
     marginTop: 12,

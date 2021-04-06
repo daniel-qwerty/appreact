@@ -8,13 +8,15 @@ import RegisterScreen              from "./screens/RegisterScreen";
 import WelcomeScreen               from "./screens/WelcomeScreen";
 import ForgotPassword              from "./screens/ForgotPassword";
 import Home                 from "./screens/Home";
-import FollowerProfile                 from "./screens/FollowerProfileScreen";
+
 import TermsConditionsScreen                 from "./screens/TermsConditionsScreen";
 import TermsServicesScreen                 from "./screens/TermsServicesScreen";
 import ChatScreen                 from "./screens/ChatScreen";
 import AccountScreen  from "./screens/AccountScreen";
 import BillingScreen  from "./screens/BillingScreen";
+import ProfileScreen  from "./screens/ProfileScreen";
 import TableScreen  from "./screens/TableScreen";
+import UploadPhotosScreen  from "./screens/UploadPhotosScreen";
 import { theme } from './utils/theme';
 import defaultData from './auth/defaultData'
 import AuthContext from './auth/context'
@@ -27,20 +29,21 @@ const App = () => {
   const [authData, setAuthData] = useState(defaultData)
 
   return (
-    <PaperProvider theme={theme}>
+    <PaperProvider theme={theme} >
       <AuthContext.Provider value={{authData, setAuthData}}>
-        <NavigationContainer>
+        <NavigationContainer >
           <Stack.Navigator initialRouteName="Welcome" screenOptions={{headerShown: false}}>
             {
               authData.islogged ? (
                 <>
                   <Stack.Screen name="Home" component={Home}/>
-                  <Stack.Screen name="FollowerProfile" component={FollowerProfile}/>
                   <Stack.Screen name="TermsConditions" component={TermsConditionsScreen}/>
                   <Stack.Screen name="Account" component={AccountScreen}/>
                   <Stack.Screen name="Chat" component={ChatScreen}/>
                   <Stack.Screen name="Billing" component={BillingScreen}/>
                   <Stack.Screen name="Table" component={TableScreen}/>
+                  <Stack.Screen name="Profile" component={ProfileScreen}/>
+                  <Stack.Screen name="UploadPhotos" component={UploadPhotosScreen}/>
                 </>
               ) : (
                 <>

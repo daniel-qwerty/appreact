@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -18,13 +18,16 @@ import TextInput from '../components/TextInput';
 import DropDownList from '../components/DropDownList';
 import OnlyFansButton from '../components/OnlyFansButton';
 import ButtonsLogin from '../components/ButtonsLogin'
-import DateTimePicker from '@react-native-community/datetimepicker';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import AuthContext from '../auth/context'
+
 import {descriptionValidator} from '../utils/utils';
 import {theme} from '../utils/theme'
 import * as WebBrowser from 'expo-web-browser';
 
 export default function RegisterScreen({navigation}) {
+
+  const {authData, setAuthData} = useContext(AuthContext)
+
   const [description,
     setDescription] = useState({value: '', error: ''});
   const [name,
@@ -80,19 +83,31 @@ export default function RegisterScreen({navigation}) {
     //navigation.navigate('Dashboard');
   };
 
-   _handleOpenWithWebBrowser = () => {
-    WebBrowser.openBrowserAsync('https://www.onlyfans.com');
-  };
+  //  _handleOpenWithWebBrowser = () => {
+  //   WebBrowser.openBrowserAsync('https://www.onlyfans.com');
+  // };
 
   return (
 
     <BackgroundHome>
 
-      <OnlyFansButton Press={this._handleOpenWithWebBrowser}/>
+       <Header>
+         <Appbar.BackAction color='white' onPress={() => navigation.goBack()} />
+        <Appbar.Content titleStyle={styles.appBarTitle} title="Profile" />
+        <Appbar.Action icon="" />
+        {authData.showTimer ? (
+          <>
+            <Appbar.Content titleStyle={styles.appBarTimer} subtitleStyle={styles.appBarTimer} title="22:45:34" subtitle="Availably"/>
+          </>
+        ) : <></>}
+        <Appbar.Action icon="image-multiple" color='white' onPress={() => navigation.navigate('UploadPhotos')}/>
+      </Header>
 
-      
+     <View style={styles.container}>
 
-      <View style={styles.headerContainer}>
+       
+
+       <View style={styles.headerContainer}>
         <View style={styles.userRow}>
           <Surface style={styles.userImageSurface}>
             <ProfileImage
@@ -129,7 +144,7 @@ export default function RegisterScreen({navigation}) {
       </View>
 
       <View style={styles.containerDatePickers}>
-              <View style={{
+              {/* <View style={{
                 width: '80%'
               }}>
                   <Text style={styles.label}>Availability</Text>
@@ -154,7 +169,7 @@ export default function RegisterScreen({navigation}) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitch}
                   value={isEnabled}/>
-              </View>
+              </View> */}
             </View>
 
       <TextInput
@@ -332,11 +347,22 @@ export default function RegisterScreen({navigation}) {
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
         </TouchableOpacity>
       </View> */}
+
+     </View>
+
+      
+
+      
     </BackgroundHome>
   );
 }
 
 const styles = StyleSheet.create({
+   container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+    },
   label: {
     textAlign: 'right',
     width: '100%',
@@ -439,5 +465,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     marginBottom: 10,
     marginTop: 50
-  }
+  },
+  appBarTitle: {
+    color: theme.colors.appBarTitleColor,
+    fontWeight: 'bold'
+  },
+   appBarTimer: {
+    color: theme.colors.appBarTitleColor,
+    textAlign:'right'
+  },
 });

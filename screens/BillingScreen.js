@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, FlatList} from 'react-native';
-import {List, IconButton, Card, Surface} from 'react-native-paper';
+import {List, IconButton, Card, Surface, Appbar} from 'react-native-paper';
 
 import Logo from '../components/Logo'
 import Background from '../components/Background'
@@ -9,7 +9,7 @@ import Button from '../components/Botton'
 import FilterButton from '../components/FilterButton'
 import Header from '../components/Header'
 import {theme} from '../utils/theme'
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+//import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DropDownList from '../components/DropDownList';
 import BackButton from '../components/BackButton';
 
@@ -125,11 +125,13 @@ export default function BillingScreen({navigation}) {
     
     <Background>
 
-      <BackButton goBack={() => navigation.goBack()}/>
+      <Appbar.Header style={{width:'100%'}}>
+      <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.Content title="My Biiling"  />
+      <Appbar.Action icon="calendar" onPress={showFilterDates} />
+    </Appbar.Header>
 
-      <Header>Billing</Header>
-
-      <FilterButton Press={showFilterDates} />
+    
 
       {isFilterDatesVisibled
         ? (
@@ -153,7 +155,7 @@ export default function BillingScreen({navigation}) {
                 editable={true}
                 onFocus={showDatePickerTo}/>
 
-              <DateTimePickerModal
+              {/* <DateTimePickerModal
                 isVisible={isDatePickerVisibledDateTo}
                 mode="date"
                 onConfirm={handleConfirmTo}
@@ -163,7 +165,7 @@ export default function BillingScreen({navigation}) {
                 isVisible={isDatePickerVisibledDateFrom}
                 mode="date"
                 onConfirm={handleConfirmFrom}
-                onCancel={hideDatePickerFrom}/>
+                onCancel={hideDatePickerFrom}/> */}
 
             </Card.Content>
           </Card>
@@ -195,7 +197,7 @@ export default function BillingScreen({navigation}) {
       <FlatList
         style={{
         height: '100%',
-        width: '100%',
+        width: '85%',
         marginHorizontal: 10
       }}
         data={listData}
@@ -241,12 +243,12 @@ const styles = StyleSheet.create({
   cardDates: {
     marginVertical: 10,
     height: 150,
-    width: '100%'
+    width: '85%'
   },
   cardFilter: {
     marginVertical: 10,
     height: 80,
-    width: '100%',
+    width: '85%',
     backgroundColor: theme.colors.primary,
      borderRadius: 25,
   }

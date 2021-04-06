@@ -6,6 +6,8 @@ export const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#FD91B9',
-    accent: '#4A4849',  
+    accent: '#4A4849',
+    appBarTitleColor: '#FFFFFF',  
+    appBarIconColor: '#FFFFFF',  
   },
 };

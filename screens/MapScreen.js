@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,16 +7,21 @@ import {
   Dimensions,
   TouchableOpacity
 } from 'react-native';
-import {Surface} from 'react-native-paper';
+import {Surface, Appbar} from 'react-native-paper';
+
 import Background from '../components/Background'
 import {theme} from '../utils/theme'
 import Header from '../components/Header'
 import data  from "../utils/dataMaps/map1";
+import AuthContext from '../auth/context'
+import Timer from '../components/Timer'
 
 
  const numColumns = 14;
 
 export default function DirectMessagesScreen({navigation}) {
+
+  const {authData, setAuthData} = useContext(AuthContext)
 
   const formatData = (data, numColumns) => {
     const numberOfFullRows = Math.floor(data.length / numColumns);
@@ -94,7 +99,18 @@ export default function DirectMessagesScreen({navigation}) {
  
   return (
     <Background>
-      <Header>Map</Header>
+      <Header>
+        <Appbar.Content titleStyle={styles.appBarTitle} title="Home" />
+        <Appbar.Action icon="" />
+        
+        {authData.showTimer ? (
+          <>
+            <Timer></Timer>
+          </>
+        ) : <></>}
+        
+      </Header>
+ 
       <FlatList
         data={formatData(data, numColumns)}
         style={styles.container}
@@ -108,7 +124,6 @@ export default function DirectMessagesScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: 20,
     width: '100%'
   },
   item: {
@@ -146,5 +161,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     backgroundColor: theme.colors.accent,
     fontSize: 10
-  }
+  },
+  appBarTitle: {
+    color: theme.colors.appBarTitleColor,
+    fontWeight: 'bold'
+  },
+   appBarTimer: {
+    color: theme.colors.appBarTitleColor,
+    textAlign:'right'
+  },
 });

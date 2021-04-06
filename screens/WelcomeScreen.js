@@ -10,9 +10,10 @@ import Header from '../components/Header'
 
 export default function RegisterScreen({navigation}) {
   return (
-   <Background>
-    <Logo />
-    <Header>Enterteiner</Header>
+   <Background >
+     <View style={styles.container}>
+<Logo />
+    <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Enterteiner</Text>
 
     <Paragraph>
       Lorem ipsum dolor sit amet, consectetur adipiscing.
@@ -26,6 +27,8 @@ export default function RegisterScreen({navigation}) {
     >
       Sign Up
     </Button>
+     </View>
+    
   </Background>
   );
 }
@@ -36,5 +39,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems     : 'center',
     justifyContent : 'center',
+    width:'85%'
   },
 });

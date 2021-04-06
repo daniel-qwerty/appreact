@@ -32,7 +32,7 @@ export default function FollowersScreen({navigation}) {
         marginHorizontal: 5,
         flex: 1 / numColumns
       }}>
-        <TouchableOpacity onPress={() => navigation.navigate('FollowerProfile')}>
+        <TouchableOpacity >
           <Surface style={styles.surface}>
             <Image
               source={{
@@ -51,7 +51,7 @@ export default function FollowersScreen({navigation}) {
   return (
     <Background>
 
-      <Header>Followers</Header>
+      <Header></Header>
 
       <FlatList
         style={{

@@ -8,9 +8,10 @@ import BackButton from '../components/BackButton';
 export default function TermsServicesScreen({navigation}) {
   return (
     <BackgroundHome>
-      <BackButton goBack={() => navigation.goBack()}/>
+      
       <View style={styles.container}>
-        <Header>Terms of Service</Header>
+        <BackButton goBack={() => navigation.goBack()}/>
+        <Text style={{fontSize: 26,fontWeight: 'bold',marginTop: 50,}}>Terms of Service</Text>
 
         <Text style={styles.paragraphText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
@@ -40,7 +41,7 @@ export default function TermsServicesScreen({navigation}) {
           tincidunt ac, fermentum eget mauris.
         </Text>
 
-        <Header>Privacy Policy</Header>
+        <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Privacy Policy</Text>
 
         <Text style={styles.paragraphText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
@@ -76,7 +77,9 @@ export default function TermsServicesScreen({navigation}) {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 50
+    marginVertical: 50,
+    width:'85%',
+    height:'100%'
   },
   paragraphText: {
     textAlign: 'left',

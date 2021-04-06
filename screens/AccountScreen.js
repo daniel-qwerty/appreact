@@ -5,9 +5,10 @@ import Header from '../components/Header';
 import Button from '../components/Botton';
 import TextInput from '../components/TextInput';
 import BackButton from '../components/BackButton';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+//import DateTimePickerModal from "react-native-modal-datetime-picker";
 import TextInputForDate from '../components/TextInputDate';
 import {emailValidator, passwordValidator, nameValidator} from '../utils/utils';
+import {Appbar} from 'react-native-paper';
 
 export default function AccountScreen({navigation}) {
   const [name,
@@ -68,9 +69,14 @@ export default function AccountScreen({navigation}) {
     <BackgroundHome>
       <BackButton goBack={() => navigation.goBack()}/>
 
-      <Header>My Account</Header>
+      <Header>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.Content title="My Account"  />
 
-      <TextInput
+      </Header>
+    
+   <View style={styles.container}>
+<TextInput
         label="Name"
         returnKeyType="next"
         value={name.value}
@@ -109,20 +115,29 @@ export default function AccountScreen({navigation}) {
         textContentType="emailAddress"
         keyboardType="email-address"/>
 
-      <DateTimePickerModal
+      {/* <DateTimePickerModal
         isVisible={isDatePickerVisibledDateFrom}
         mode="date"
         onConfirm={handleConfirmFrom}
-        onCancel={hideDatePickerFrom}/>
+        onCancel={hideDatePickerFrom}/> */}
       <Button mode="contained" onPress={_onSignUpPressed} style={styles.button}>
         Save
       </Button>
+     </View>
+
+      
 
     </BackgroundHome>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+      top:20
+    },
   label: {
     fontWeight: '600'
   },

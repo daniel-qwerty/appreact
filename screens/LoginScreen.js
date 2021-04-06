@@ -86,7 +86,8 @@ export default function LoginScreen({ navigation }) {
   async function  checkForBiometrics() {
    let biometricRecords = await LocalAuthentication.isEnrolledAsync();
     if (!biometricRecords) {
-    alert('No Biometrics Found')
+    //alert('No Biometrics Found')
+    console.log('No Biometrics Found');
     } 
     else {
     //alert('Biometrics Found')
@@ -119,9 +120,10 @@ export default function LoginScreen({ navigation }) {
 
   return (
      <Background>
-      <BackButton goBack={() => navigation.navigate('Welcome')} />
+       <View style={styles.container}>
+         <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo />
-      <Header>Enterteiner</Header>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Enterteiner</Text>
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -177,13 +179,18 @@ export default function LoginScreen({ navigation }) {
         }}>
         Email or password Incorrect
       </Snackbar>
+       </View>
+      
     </Background>
   );
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff'
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+      height:'100%',
     },
     forgotPassword: {
     width: '100%',

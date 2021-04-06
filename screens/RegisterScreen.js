@@ -45,11 +45,12 @@ export default function RegisterScreen({navigation}) {
 
   return (
     <Background>
-      <BackButton goBack={() => navigation.navigate('Welcome')} />
+      <View style={styles.container}>
+        <BackButton goBack={() => navigation.navigate('Welcome')} />
 
-      <Logo />
+      <Logo/>
 
-      <Header>Create Account</Header>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Create Account</Text>
 
       <TextInput
         label="Name"
@@ -106,11 +107,18 @@ export default function RegisterScreen({navigation}) {
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
         </TouchableOpacity>
       </View>
+      </View>
+      
     </Background>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+    },
   label: {
    fontWeight:'600'
   },
