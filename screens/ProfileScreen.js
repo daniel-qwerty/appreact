@@ -19,6 +19,7 @@ import DropDownList from '../components/DropDownList';
 import OnlyFansButton from '../components/OnlyFansButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
+import Timer from '../components/Timer'
 
 import {descriptionValidator} from '../utils/utils';
 import {theme} from '../utils/theme'
@@ -93,11 +94,11 @@ export default function RegisterScreen({navigation}) {
 
        <Header>
          <Appbar.BackAction color='white' onPress={() => navigation.goBack()} />
-        <Appbar.Content titleStyle={styles.appBarTitle} title="Profile" />
-        <Appbar.Action icon="" />
+         <Appbar.Content title="Profile"  titleStyle={styles.appBarTitle}  />
+       
         {authData.showTimer ? (
           <>
-            <Appbar.Content titleStyle={styles.appBarTimer} subtitleStyle={styles.appBarTimer} title="22:45:34" subtitle="Availably"/>
+           <Timer></Timer>
           </>
         ) : <></>}
         <Appbar.Action icon="image-multiple" color='white' onPress={() => navigation.navigate('UploadPhotos')}/>

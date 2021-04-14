@@ -39,9 +39,8 @@ export default function TableScreen({route, navigation}) {
         <View style={styles.body}>
             <Text style={styles.name}>John Doe</Text>
             {/* <Text style={styles.description}>{club}</Text> */}
-            <Text style={styles.info}>TABLE: {table} / SEAT: {seat}</Text>
+            <Text style={styles.info}>TABLE: {table}</Text>
           
-       
         </View>
          <Chat/>
 
@@ -57,7 +56,7 @@ export default function TableScreen({route, navigation}) {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: theme.colors.primary,
-    height: 100,
+    height: 150,
     paddingHorizontal:20
   },
   avatar: {
@@ -69,16 +68,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'center',
     position: 'absolute',
-    marginTop: 30
+    marginTop: 60,
+    
   },
-  name: {
-    fontSize: 22,
-    color: "#FFFFFF",
-    fontWeight: '600'
-  },
+  
   body: {
     marginTop: 60,
     alignItems: 'center',
+    height:90
   },
   bodyContent: {
     flex: 1,
@@ -89,14 +86,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     height: 30,
     color: "#696969",
-    fontWeight: "600"
+    fontWeight: "600",
+    marginBottom:5
   },
   info: {
     fontSize: 16,
     height: 30,
     color: theme.colors.accent,
     marginTop: 10,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   description: {
     fontSize: 16,

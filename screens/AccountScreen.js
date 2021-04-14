@@ -9,6 +9,7 @@ import BackButton from '../components/BackButton';
 import TextInputForDate from '../components/TextInputDate';
 import {emailValidator, passwordValidator, nameValidator} from '../utils/utils';
 import {Appbar} from 'react-native-paper';
+import {theme} from '../utils/theme'
 
 export default function AccountScreen({navigation}) {
   const [name,
@@ -70,8 +71,9 @@ export default function AccountScreen({navigation}) {
       <BackButton goBack={() => navigation.goBack()}/>
 
       <Header>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-      <Appbar.Content title="My Account"  />
+        <Appbar.BackAction color="white" onPress={() => navigation.goBack()} />
+      <Appbar.Content title="My Account" titleStyle={styles.appBarTitle}  />
+      
 
       </Header>
     
@@ -150,5 +152,9 @@ const styles = StyleSheet.create({
   },
   link: {
     fontWeight: 'bold'
-  }
+  },
+  appBarTitle: {
+    color: theme.colors.appBarTitleColor,
+    fontWeight: 'bold'
+  },
 });

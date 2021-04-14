@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { Text, StyleSheet, View } from 'react-native';
+import {Snackbar } from 'react-native-paper';
 import { emailValidator } from '../utils/utils';
 import Background from '../components/Background';
 import BackButton from '../components/BackButton';
@@ -7,11 +8,15 @@ import Logo from '../components/Logo';
 import Header from '../components/Header';
 import TextInput from '../components/TextInput';
 import Button from '../components/Botton';
-
+import firebase from 'firebase';
 
 export default function RegisterScreen({navigation}) {
 
   const [email, setEmail] = useState({ value: '', error: '' });
+
+  const [snackBarVisible, setSnackBarVisible] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
+  const onDismissSnackBar = () => setSnackBarVisible(false);
 
   const _onSendPressed = () => {
     const emailError = emailValidator(email.value);
@@ -21,7 +26,18 @@ export default function RegisterScreen({navigation}) {
       return;
     }
 
-    navigation.navigate('Login');
+    var auth = firebase.auth();
+
+    auth.sendPasswordResetEmail(email.value).then(function() {
+      // Email sent.
+      setSnackBarMessage(`We have emailed your password reset link to ${email.value}`);
+      setSnackBarVisible(!snackBarVisible)
+    }).catch(function(error) {
+      // An error happened.
+      console.log(error);
+    });
+
+   // navigation.navigate('Login');
   };
 
   return (
@@ -51,7 +67,19 @@ export default function RegisterScreen({navigation}) {
         Send Reset Instructions
       </Button>
       </View>
-      
+      <Snackbar
+        visible={snackBarVisible}
+        onDismiss={onDismissSnackBar}
+        duration={5000}
+        action={{
+          label: 'X',
+          onPress: () => {
+            // Do something
+            console.log('object');
+          },
+        }}>
+        {snackBarMessage}
+      </Snackbar>
 
     
     </Background>

@@ -1,5 +1,6 @@
 import React, { memo, useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {Snackbar } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
 import Header from '../components/Header';
@@ -14,19 +15,25 @@ import {
   nameValidator,
 } from '../utils/utils';
 
+import firebase from 'firebase';
+
 export default function RegisterScreen({navigation}) {
+
+  const [snackBarVisible, setSnackBarVisible] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
+  const onDismissSnackBar = () => setSnackBarVisible(false);
   const [name, setName] = useState({ value: '', error: '' });
   const [email, setEmail] = useState({ value: '', error: '' });
   const [phone, setPhone] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
    const {authData, setAuthData} = useContext(AuthContext)
   
-  const RegisterUser = () => {
-    setAuthData({
-      ...authData, 
-      islogged: true
-    })
-  };
+  // const RegisterUser = () => {
+  //   setAuthData({
+  //     ...authData, 
+  //     islogged: true
+  //   })
+  // };
 
   const _onSignUpPressed = () => {
     const nameError = nameValidator(name.value);
@@ -40,14 +47,49 @@ export default function RegisterScreen({navigation}) {
       return;
     }
 
-    RegisterUser();
+    signUpWithEmail();
   };
+
+   const signUpWithEmail = async() => {
+    await firebase
+      .auth()
+      .createUserWithEmailAndPassword(email.value, password.value)
+      .then(resp =>{
+         console.log('registro');
+         var user = firebase.auth().currentUser;
+
+        user.sendEmailVerification().then(function() {
+          navigation.navigate('VerificationEmail', {email: email.value})
+          // setSnackBarMessage(`Your registration has been successful, we send you a verification email to ${email.value}`);
+          // setSnackBarVisible(!snackBarVisible)
+        }).catch(function(error) {
+           
+          console.log(error);
+        });
+          
+        }
+      )
+      .catch(error => {
+          let errorCode = error.code;
+          let errorMessage = error.message;
+          if (errorCode == 'auth/weak-password') {
+              //this.onLoginFailure.bind(this)('Weak Password!');
+              console.log('Weak Password!');
+              setSnackBarMessage('Weak Password!');
+              setSnackBarVisible(!snackBarVisible)
+          } else {
+              //this.onLoginFailure.bind(this)(errorMessage);
+              console.log(errorMessage);
+              setSnackBarMessage(errorMessage);
+              setSnackBarVisible(!snackBarVisible)
+          }
+      });
+  }
 
   return (
     <Background>
       <View style={styles.container}>
         <BackButton goBack={() => navigation.navigate('Welcome')} />
-
       <Logo/>
 
       <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Create Account</Text>
@@ -101,14 +143,26 @@ export default function RegisterScreen({navigation}) {
         Sign Up
       </Button>
       <Text style={styles.label}> Or </Text>
-      <ButtonsLogin onPress={RegisterUser}  />
+      <ButtonsLogin  />
       <View style={styles.row}>
         <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
         </TouchableOpacity>
       </View>
       </View>
-      
+      <Snackbar
+        visible={snackBarVisible}
+        onDismiss={onDismissSnackBar}
+        duration={5000}
+        action={{
+          label: 'X',
+          onPress: () => {
+            // Do something
+            console.log('object');
+          },
+        }}>
+        {snackBarMessage}
+      </Snackbar>
     </Background>
   );
 }

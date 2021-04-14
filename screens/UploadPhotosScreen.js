@@ -13,6 +13,7 @@ import Header from '../components/Header';
 import {Appbar} from 'react-native-paper';
 import {theme} from '../utils/theme'
 import * as ImagePicker from 'expo-image-picker';
+import BackgroundHome from '../components/BackgroundHome';
 
 export default class UploadPhotos extends Component {
 
@@ -63,7 +64,7 @@ export default class UploadPhotos extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <BackgroundHome style={styles.container}>
         <Header>
           <Appbar.BackAction color='white' onPress={() => this.props.navigation.goBack()} />
           <Appbar.Content titleStyle={styles.appBarTitle} title="Add Images" />
@@ -96,7 +97,7 @@ export default class UploadPhotos extends Component {
               </View>
             )
           }}/>
-      </View>
+      </BackgroundHome>
     );
   }
 }
@@ -104,7 +105,6 @@ export default class UploadPhotos extends Component {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    marginTop:20,
   },
   list: {
     paddingHorizontal: 10,

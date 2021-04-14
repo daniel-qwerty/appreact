@@ -17,9 +17,23 @@ import BillingScreen  from "./screens/BillingScreen";
 import ProfileScreen  from "./screens/ProfileScreen";
 import TableScreen  from "./screens/TableScreen";
 import UploadPhotosScreen  from "./screens/UploadPhotosScreen";
+import VerificationEmailScreen  from "./screens/VerificationEmailScreen";
 import { theme } from './utils/theme';
 import defaultData from './auth/defaultData'
 import AuthContext from './auth/context'
+
+import firebase from 'firebase'
+
+
+const firebaseConfig = {
+   apiKey: "AIzaSyDq-cEkNtbGLWRgZ6DlPQ1F4HY03SPi_Lw",
+    authDomain: "enterteiner-1322c.firebaseapp.com",
+    projectId: "enterteiner-1322c",
+    storageBucket: "enterteiner-1322c.appspot.com",
+    messagingSenderId: "63643136082",
+    appId: "1:63643136082:web:cf7d647f33b9e02c24ef8b"
+}
+firebase.initializeApp(firebaseConfig);
 
 
 const Stack = createStackNavigator();
@@ -52,6 +66,7 @@ const App = () => {
                 <Stack.Screen name="Login" component={LoginScreen}/>
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
                 <Stack.Screen name="TermsService" component={TermsServicesScreen}/>
+                <Stack.Screen name="VerificationEmail" component={VerificationEmailScreen}/>
                 </>
               )
             }

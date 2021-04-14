@@ -8,7 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 const Header = ({ children, props }) => (
   <Appbar.Header {...props} style={{width:'100%',}}>
     {children}
-     <Appbar.Action color={theme.colors.appBarIconColor} icon="crown" onPress={() => { WebBrowser.openBrowserAsync('https://www.onlyfans.com')}} />
+     {/* <Appbar.Action color={theme.colors.appBarIconColor} icon="crown" onPress={() => { WebBrowser.openBrowserAsync('https://www.onlyfans.com')}} /> */}
   </Appbar.Header>
 );
 

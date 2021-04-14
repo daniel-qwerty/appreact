@@ -9,8 +9,10 @@ const TextInput = ({ errorText, ...props }) => (
   <View style={styles.container}>
     <Input
       style={styles.input}
+      dense={false}
       underlineColor="transparent"
       mode="outlined"
+      
       {...props}
     />
     {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
@@ -24,7 +26,10 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white',
-    height:45
+    textAlignVertical:'top'
+  },
+  internalTextinput: {
+    backgroundColor:'red'
   },
   error: {
     fontSize: 14,

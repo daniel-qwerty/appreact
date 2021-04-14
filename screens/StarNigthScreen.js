@@ -59,6 +59,7 @@ export default function DirectMessagesScreen({navigation}) {
 
 const [modalVisible, setModalVisible] = useState(true);
 
+
 return (
 
   <SafeAreaView style={{
@@ -74,8 +75,6 @@ return (
             <Timer></Timer>
           </>
         ) : <></>}
-        
-
       </Header>
       <PaymentView
         style={{

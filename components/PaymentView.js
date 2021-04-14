@@ -5,6 +5,9 @@ import {theme} from '../utils/theme'
 import AuthContext from '../auth/context'
 import Modal from 'react-native-modal';
 import Button from '../components/Botton';
+import BigTimer from '../components/BigTimer'
+import {IconButton, Surface} from 'react-native-paper';
+
 
 const STRIPE_PK = 'pk_test_gkEAGFAdUkkaZtIHSXbW1jCm00aS7wS0PA'
 
@@ -12,13 +15,43 @@ const STRIPE_PK = 'pk_test_gkEAGFAdUkkaZtIHSXbW1jCm00aS7wS0PA'
 const PaymentView = (props) => { 
 
   const {authData, setAuthData} = useContext(AuthContext)
+  const [showStatusModal, setShowStatusModal] = useState(false);
+
+  const openModalStatus = () => {
+    setShowStatusModal(true);
+  };
+
+  const closeModalStatus = () => {
+    setShowStatusModal(false);
+  };
+
+  const changeModalStatus = () => {
+    if(authData.available)
+        setAuthData({...authData,  available: false})
+    else
+       setAuthData({...authData,  available: true})
+
+    setShowStatusModal(false);
+  };
+  
+  
 
   const showModalPaySuccess = () => {
-    setAuthData({...authData, showModalPaySuccess: true})
+    setAuthData({...authData, showModalPaySuccess: true, hasPayment: true, available: true})
   };
 
   const closeModalPaySuccess = () => {
     setAuthData({...authData, showModalPaySuccess: false, showTimer: true});
+  };
+
+  function stop(){
+    setAuthData({...authData, timer:"stop", });
+    console.log("stop");
+  };
+
+  function start(){
+    setAuthData({...authData, timer:"start", showTimer: true});
+    console.log("start");
   };
 
     const { amount, product} = props
@@ -285,24 +318,53 @@ const PaymentView = (props) => {
         const { data } =  event.nativeEvent;
          console.log(data)
          onCheckStatus(data)
-         if(JSON.parse(data).error.code === 'api_key_expired')
-            showModalPaySuccess()
-        
+         if(JSON.parse(data).error.code === 'api_key_expired'){
+             showModalPaySuccess()
+         }
     }
 
-
-
-return (
-<View style={{backgroundColor:'red', height:'100%'}}>
-    <WebView
-        javaScriptEnabled={true}
-        style={{ flex: 1}}
-        originWhitelist={['*']}
-        source={{ html: htmlContent}}
-        injectedJavaScript={injectedJavaScript}
-        onMessage={onMessage}
-    
-    />
+    return (
+    <View style={{backgroundColor:'white', height:'100%'}}>     
+        {authData.hasPayment ? (
+          <>
+            <View style={styles.container}>
+                
+                 {authData.available ? (
+                    <>
+                         <IconButton  icon="eye-outline" size={60} style={styles.iconAvailably} />
+                    </>
+                    ) : 
+                    <>
+                         <IconButton  icon="eye-off-outline" size={60} style={styles.iconAvailably} />
+                    </>}
+                <Surface style={styles.surface}>
+                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
+                    {authData.available ? (
+                    <>
+                        <Text style={styles.textAvailable}>YOUR STATUS IS: AVAILABLE</Text>
+                    </>
+                    ) : 
+                    <>
+                        <Text style={styles.textAvailable}>YOUR STATUS IS: NOT AVAILABLE</Text>
+                    </>}
+                </Surface>
+                <Button mode="contained" style={styles.buttonAvailably} onPress={openModalStatus}>
+                    Change Status
+                </Button>
+            </View>
+          </>
+        ) : 
+        <>
+            <WebView
+            javaScriptEnabled={true}
+            style={{ flex: 1}}
+            originWhitelist={['*']}
+            source={{ html: htmlContent}}
+            injectedJavaScript={injectedJavaScript}
+            onMessage={onMessage}
+            />
+        </>}
+   
 
     <View style={styles.containerModal}>
         <Modal
@@ -314,14 +376,39 @@ return (
           <View style={styles.content}>
             <Text style={styles.contentTitle}>Payment Successful 👍!</Text>
             <Text>now you're available for 24 hrs</Text>
-            <Button mode="contained" onPress={closeModalPaySuccess} style={styles.button}>
+            <Button mode="contained" onPress={closeModalPaySuccess} style={styles.button} >
                 Ok
             </Button>
           </View>
         </Modal>
+        <Modal
+          backdropOpacity={0.3}
+          isVisible={showStatusModal}
+          onBackdropPress={closeModalStatus}
+          style={styles.contentView}
+        >
+          <View style={styles.content}>
+            <Text style={styles.contentTitle}>Status</Text>
+            
+            {authData.available ? (
+            <>
+                <Text>Change your status to not available❓</Text>
+            </>
+            ) : 
+            <>
+                <Text>Change your status to available❓</Text>
+            </>}
+            <Button mode="contained" onPress={changeModalStatus} style={styles.button} >
+                YES
+            </Button>
+            <Button mode="contained" onPress={closeModalStatus} style={styles.button} >
+                NO
+            </Button>
+          </View>
+        </Modal>
       </View>
-</View>
-);
+    </View>
+    );
 
 
 
@@ -333,11 +420,13 @@ return (
  export { PaymentView }
  const styles = StyleSheet.create({
 container: {
-  flex: 1
+  flex: 1,
+  alignItems     : 'center',
+      
 },
 navigation: {
   flex: 2,
-  backgroundColor: 'red'
+  backgroundColor: 'white'
 },
 body: {
   flex: 10,
@@ -382,4 +471,34 @@ appBarTitle: {
   button: {
     marginTop: 12,
   },
+  surface: {
+    backgroundColor: theme.colors.primary,
+    width: '85%',
+    height: 200,
+    elevation: 3,
+    borderRadius: 15,
+    paddingHorizontal:25,
+    paddingVertical:55
+  },
+  buttonAvailably: {
+    marginTop: -25,
+    width: '50%',
+    elevation:6,
+    backgroundColor: 'white',
+    color:'white'
+  },
+  iconAvailably:{
+    marginTop:0,
+    backgroundColor:'white',
+    position:'relative',
+    top:50,
+    zIndex:7000
+  },
+  textAvailable:{
+      color:'white',
+      fontSize: 16,
+      fontWeight:'bold',
+      textAlign:'center',
+      marginTop:30
+  }
 });

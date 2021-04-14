@@ -19,11 +19,14 @@ import {
   nameValidator,
 } from '../utils/utils';
 
+import firebase from 'firebase';
+
 export default function LoginScreen({ navigation }) {
 
   const [email, setEmail] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
   const [snackBarVisible, setSnackBarVisible] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
    const [scanned, SetScanned] = useState(false);
    const [haveKeychain, SetHaveKeychain] = useState(false);
 
@@ -47,14 +50,48 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    if(email.value === 'barbie@gmail.com' && password.value === '123456'){
-      save('entertainer', JSON.stringify({email: email.value, password: password.value}));
-      SetScanned(true);
-      loginAuth();
-    } else {
-      setSnackBarVisible(!snackBarVisible)
-    }
+    signInWithEmail();
+
+    // if(email.value === 'barbie@gmail.com' && password.value === '123456'){
+    //   save('entertainer', JSON.stringify({email: email.value, password: password.value}));
+    //   SetScanned(true);
+    //   loginAuth();
+    // } else {
+    //   setSnackBarVisible(!snackBarVisible)
+    // }
   };
+
+   const signInWithEmail = async() => {
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(email.value, password.value)
+      .then(resp =>{
+          var user = firebase.auth().currentUser;
+          if (user.emailVerified){
+              save('entertainer', JSON.stringify({email: email.value, password: password.value}));
+              SetScanned(true);
+              loginAuth();
+          } else {
+            firebase.auth().signOut();
+            setSnackBarMessage('Your email is not verified, please check your email and validate your email');
+            setSnackBarVisible(!snackBarVisible)
+          }
+        }
+      )
+      .catch(error => {
+          let errorCode = error.code;
+          let errorMessage = error.message;
+          if (errorCode == 'auth/weak-password') {
+              //this.onLoginFailure.bind(this)('Weak Password!');
+              console.log('Weak Password!');
+          } else {
+              //this.onLoginFailure.bind(this)(errorMessage);
+              console.log(errorMessage);
+              setSnackBarMessage(errorMessage);
+              setSnackBarVisible(!snackBarVisible)
+          }
+      });
+  }
 
   async function save(key, value) {
     await SecureStore.setItemAsync(key, value);
@@ -104,10 +141,16 @@ export default function LoginScreen({ navigation }) {
      let result = await LocalAuthentication.authenticateAsync();
      if (result.success) {
       //getValueFor('entertainer');
-      if(haveKeychain){
-        SetScanned(true);
-        loginAuth();
-      }
+      let data = await SecureStore.getItemAsync('entertainer');
+      setEmail({ value: JSON.parse(data).email, error: '' })
+      setPassword({ value: JSON.parse(data).password, error: '' })
+      console.log(JSON.parse(data).email);
+    
+     
+      // if(haveKeychain){
+      //   SetScanned(true);
+      //   //loginAuth();
+      // }
      }
   };
 
@@ -116,7 +159,7 @@ export default function LoginScreen({ navigation }) {
   
     //  let result =  SecureStore.deleteItemAsync('entertainer');
     //  console.log(result);
-  });
+  }, []);
 
   return (
      <Background>
@@ -171,13 +214,13 @@ export default function LoginScreen({ navigation }) {
         onDismiss={onDismissSnackBar}
         duration={5000}
         action={{
-          label: 'Undo',
+          label: 'X',
           onPress: () => {
             // Do something
             console.log('object');
           },
         }}>
-        Email or password Incorrect
+        {snackBarMessage}
       </Snackbar>
        </View>
       

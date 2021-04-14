@@ -10,6 +10,7 @@ import Button from '../components/Botton'
 import Header from '../components/Header'
 import {theme} from '../utils/theme'
 import AuthContext from '../auth/context'
+import firebase from 'firebase';
 
 export default function SettingsScreen({navigation}) {
 
@@ -48,6 +49,7 @@ export default function SettingsScreen({navigation}) {
   ];
 
   const logOutAuth = () => {
+    firebase.auth().signOut();
     setAuthData({
       ...authData, 
       islogged: false
