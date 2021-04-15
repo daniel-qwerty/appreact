@@ -166,7 +166,7 @@ export default function LoginScreen({ navigation }) {
        <View style={styles.container}>
          <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo />
-      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Enterteiner</Text>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Entertainer</Text>
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -200,8 +200,8 @@ export default function LoginScreen({ navigation }) {
       <Button mode="contained" onPress={_checkUser} >
         Login
       </Button>
-      <Text style={styles.label}> Or </Text>
-      <ButtonsLogin onPress={loginAuth}  />
+      {/* <Text style={styles.label}> Or </Text>
+      <ButtonsLogin onPress={loginAuth}  /> */}
       <View style={styles.row}>
         <Text style={styles.label}>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>

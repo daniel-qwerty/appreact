@@ -9,6 +9,7 @@ import TextInput from '../components/TextInput';
 import BackButton from '../components/BackButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
+
 import {
   emailValidator,
   passwordValidator,
@@ -16,6 +17,7 @@ import {
 } from '../utils/utils';
 
 import firebase from 'firebase';
+import * as Facebook from 'expo-facebook'
 
 export default function RegisterScreen({navigation}) {
 
@@ -86,6 +88,24 @@ export default function RegisterScreen({navigation}) {
       });
   }
 
+  const signUpWithFacebook = async() => {
+    try {
+      Facebook.initializeAsync({appId:'1461728394088946'});
+      const { type, token } = await Facebook.logInWithReadPermissionsAsync({
+        permissions: ['public_profile'],
+      });
+      if (type === 'success') {
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        const credential = firebase.auth.FacebookAuthProvider.credential(token);
+        const facebookProfileData = await firebase.auth().signInWithCredential(credential);
+        //this.onLoginSuccess.bind(this);
+      }
+      
+    } catch ({message}) {
+      alert(`Facebook Login Error: ${message}`);
+    }
+  }
+
   return (
     <Background>
       <View style={styles.container}>
@@ -142,8 +162,11 @@ export default function RegisterScreen({navigation}) {
       <Button mode="contained" onPress={_onSignUpPressed} style={styles.button}>
         Sign Up
       </Button>
-      <Text style={styles.label}> Or </Text>
-      <ButtonsLogin  />
+      {/* <Text style={styles.label}> Or </Text> */}
+      <Button mode="contained" onPress={signUpWithFacebook} style={styles.button}>
+        Facebook
+      </Button>
+      {/* <ButtonsLogin  /> */}
       <View style={styles.row}>
         <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
           <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>

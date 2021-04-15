@@ -34,7 +34,7 @@ export default function RegisterScreen({navigation}) {
           fontSize: 26,
           fontWeight: 'bold',
           paddingVertical: 14
-        }}>Enterteiner</Text>
+        }}>Entertainer</Text>
 
         <Paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing.
