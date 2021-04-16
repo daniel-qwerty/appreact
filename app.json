@@ -18,9 +18,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-       "infoPlist": {
-          "NSFaceIDUsageDescription": "This allows you to securely sign into your App"
-      }
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This allows you to securely sign into your App"
+      },
+      "bundleIdentifier": "com.dmonroy.Entertainer"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +32,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "facebookAutoInitEnabled": true
+    "facebookAutoInitEnabled": true,
+    "facebookScheme": "fb1461728394088946",
+    "facebookAppId": "1461728394088946",  
+    "facebookDisplayName": "Entertainer"
   }
 }
