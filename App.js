@@ -1,4 +1,4 @@
-import React,  {useState }                        from 'react';
+import React,  {useState, useEffect }                        from 'react';
 import {StyleSheet}                from 'react-native';
 import {NavigationContainer}       from '@react-navigation/native'
 import {createStackNavigator}      from '@react-navigation/stack'
@@ -18,11 +18,12 @@ import ProfileScreen  from "./screens/ProfileScreen";
 import TableScreen  from "./screens/TableScreen";
 import UploadPhotosScreen  from "./screens/UploadPhotosScreen";
 import VerificationEmailScreen  from "./screens/VerificationEmailScreen";
-import { theme } from './utils/theme';
+import { dark, light, theme } from './utils/theme';
 import defaultData from './auth/defaultData'
 import AuthContext from './auth/context'
-
-import firebase from 'firebase'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
+import firebase from 'firebase';
 
 
 const firebaseConfig = {
@@ -41,11 +42,35 @@ const Stack = createStackNavigator();
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [authData, setAuthData] = useState(defaultData)
+  const [appIsReady, setAppIsReady] = useState(false);
+
+ 
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('darkMode')
+      setAuthData({...authData, dark: value === 'true'})
+    } catch(e) {
+      // error reading value
+      console.log(e);
+    }
+  }
+
+  useEffect(()  => {
+   
+  }, [authData]);
+
+  if(!appIsReady){
+    return <AppLoading onError={(e) => {
+      setAppIsReady(true)
+       
+    }} startAsync={getData} onFinish={() => setAppIsReady(true)} />
+  }
 
   return (
-    <PaperProvider theme={theme} >
+    <PaperProvider theme={authData.dark ? dark : light} >
       <AuthContext.Provider value={{authData, setAuthData}}>
-        <NavigationContainer >
+        <NavigationContainer theme={authData.dark ? dark : light} >
           <Stack.Navigator initialRouteName="Welcome" screenOptions={{headerShown: false}}>
             {
               authData.islogged ? (

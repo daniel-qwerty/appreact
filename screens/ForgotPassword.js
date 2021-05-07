@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import {Snackbar } from 'react-native-paper';
 import { emailValidator } from '../utils/utils';
@@ -9,13 +9,17 @@ import Header from '../components/Header';
 import TextInput from '../components/TextInput';
 import Button from '../components/Botton';
 import firebase from 'firebase';
+import OverlayLoading from '../components/OverlayLoading';
+import {dark, light} from '../utils/theme'
+import AuthContext from '../auth/context'
 
 export default function RegisterScreen({navigation}) {
 
   const [email, setEmail] = useState({ value: '', error: '' });
-
+  const {authData, setAuthData} = useContext(AuthContext)
   const [snackBarVisible, setSnackBarVisible] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
+  const [isLoading,setIsLoading] = useState(false);
   const onDismissSnackBar = () => setSnackBarVisible(false);
 
   const _onSendPressed = () => {
@@ -25,12 +29,13 @@ export default function RegisterScreen({navigation}) {
       setEmail({ ...email, error: emailError });
       return;
     }
-
+    setIsLoading(true); 
     var auth = firebase.auth();
 
     auth.sendPasswordResetEmail(email.value).then(function() {
       // Email sent.
       setSnackBarMessage(`We have emailed your password reset link to ${email.value}`);
+      setIsLoading(false); 
       setSnackBarVisible(!snackBarVisible)
     }).catch(function(error) {
       // An error happened.
@@ -42,13 +47,13 @@ export default function RegisterScreen({navigation}) {
 
   return (
    <Background>
-      
+      <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
       <View style={styles.container}>
        <BackButton goBack={() => navigation.navigate('Login')} />
 
       <Logo />
 
-      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Restore Password</Text>
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14, color: authData.dark ? dark.colors.text : light.colors.text}}>Restore Password</Text>
 
       <TextInput
         label="E-mail address"

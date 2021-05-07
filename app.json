@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "Entertainer",
-    "slug": "Entertainer",
+    "name": "Minx",
+    "slug": "Minx",
     "version": "1.0.0",
     "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -17,9 +18,18 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
+      "entitlements": {
+        "com.apple.developer.networking.wifi-info": "true"
+      },
       "infoPlist": {
-        "NSFaceIDUsageDescription": "This allows you to securely sign into your App"
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
+        "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
+        "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This lets the application know if you are in a registered club, always"
       },
       "bundleIdentifier": "com.dmonroy.Entertainer"
     },
@@ -35,6 +45,6 @@
     "facebookAutoInitEnabled": true,
     "facebookScheme": "fb1461728394088946",
     "facebookAppId": "1461728394088946",  
-    "facebookDisplayName": "Entertainer"
+    "facebookDisplayName": "Minx"
   }
 }

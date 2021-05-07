@@ -13,10 +13,11 @@ import Header from '../components/Header'
 import TextInput from '../components/TextInput'
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
+import OverlayLoading from '../components/OverlayLoading';
+import {dark, light} from '../utils/theme'
 import {
   emailValidator,
   passwordValidator,
-  nameValidator,
 } from '../utils/utils';
 
 import firebase from 'firebase';
@@ -27,8 +28,9 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' });
   const [snackBarVisible, setSnackBarVisible] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
-   const [scanned, SetScanned] = useState(false);
-   const [haveKeychain, SetHaveKeychain] = useState(false);
+  const [scanned, SetScanned] = useState(false);
+  const [haveKeychain, SetHaveKeychain] = useState(false);
+  const [isLoading,setIsLoading] = useState(false);
 
   const {authData, setAuthData} = useContext(AuthContext)
   const onDismissSnackBar = () => setSnackBarVisible(false);
@@ -62,6 +64,7 @@ export default function LoginScreen({ navigation }) {
   };
 
    const signInWithEmail = async() => {
+    setIsLoading(true); 
     await firebase
       .auth()
       .signInWithEmailAndPassword(email.value, password.value)
@@ -70,9 +73,11 @@ export default function LoginScreen({ navigation }) {
           if (user.emailVerified){
               save('entertainer', JSON.stringify({email: email.value, password: password.value}));
               SetScanned(true);
+              setIsLoading(false);
               loginAuth();
           } else {
             firebase.auth().signOut();
+            setIsLoading(false);
             setSnackBarMessage('Your email is not verified, please check your email and validate your email');
             setSnackBarVisible(!snackBarVisible)
           }
@@ -83,10 +88,12 @@ export default function LoginScreen({ navigation }) {
           let errorMessage = error.message;
           if (errorCode == 'auth/weak-password') {
               //this.onLoginFailure.bind(this)('Weak Password!');
+              setIsLoading(false);
               console.log('Weak Password!');
           } else {
               //this.onLoginFailure.bind(this)(errorMessage);
               console.log(errorMessage);
+              setIsLoading(false);
               setSnackBarMessage(errorMessage);
               setSnackBarVisible(!snackBarVisible)
           }
@@ -156,17 +163,18 @@ export default function LoginScreen({ navigation }) {
 
    useEffect(() => {
     checkStoreKeyChain('entertainer');
-  
+    
     //  let result =  SecureStore.deleteItemAsync('entertainer');
     //  console.log(result);
   }, []);
 
   return (
      <Background>
-       <View style={styles.container}>
+        <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
+       <View style={authData.dark ? stylesDark.container : styles.container}>
          <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo />
-      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Entertainer</Text>
+      <Text style={authData.dark ? stylesDark.titleLogin : styles.titleLogin}>Sign In</Text>
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -189,11 +197,11 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
-      <View style={styles.forgotPassword}>
+      <View style={authData.dark ? stylesDark.forgotPassword : styles.forgotPassword}>
         <TouchableOpacity
           onPress={() => navigation.navigate('ForgotPassword')}
         >
-          <Text style={styles.label}>Forgot your password?</Text>
+          <Text style={authData.dark ? stylesDark.label : styles.label}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
 
@@ -202,10 +210,10 @@ export default function LoginScreen({ navigation }) {
       </Button>
       {/* <Text style={styles.label}> Or </Text>
       <ButtonsLogin onPress={loginAuth}  /> */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Don’t have an account? </Text>
+      <View style={authData.dark ? stylesDark.row : styles.row}>
+        <Text style={authData.dark ? stylesDark.label : styles.label}>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.link}>Sign up</Text>
+          <Text style={authData.dark ? stylesDark. link: styles.link}>Sign up</Text>
         </TouchableOpacity>
       </View>
 
@@ -245,10 +253,49 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   label: {
-    
+    color: light.colors.text
   },
   link: {
     fontWeight: 'bold',
+    color: light.colors.primary
    
   },
+  titleLogin: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    paddingVertical: 14, 
+    color: light.colors.text
+  }
+});
+
+const stylesDark = StyleSheet.create({
+    container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+      height:'100%',
+    },
+    forgotPassword: {
+    width: '100%',
+    alignItems: 'flex-end',
+    marginBottom: 24,
+  },
+  row: {
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  label: {
+    color: dark.colors.text
+  },
+  link: {
+    fontWeight: 'bold',
+    color: dark.colors.primary
+   
+  },
+  titleLogin: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    paddingVertical: 14, 
+    color: dark.colors.text
+  }
 });

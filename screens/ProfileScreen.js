@@ -1,4 +1,4 @@
-import React, {memo, useState, useContext} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   Switch,
-  Image
+  ActivityIndicator
 } from 'react-native';
 
 import {Card, Title, Surface, IconButton, Appbar} from 'react-native-paper';
@@ -20,24 +20,35 @@ import OnlyFansButton from '../components/OnlyFansButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
 import Timer from '../components/Timer'
+import OverlayLoading from '../components/OverlayLoading';
+import * as ImagePicker from 'expo-image-picker';
+
 
 import {descriptionValidator} from '../utils/utils';
-import {theme} from '../utils/theme'
-import * as WebBrowser from 'expo-web-browser';
+import {dark, light} from '../utils/theme'
+import firebase from 'firebase';
+import "firebase/firestore";
+import {
+  uploadImageAsync,
+  compressImage
+} from '../utils/utils';
 
-export default function RegisterScreen({navigation}) {
+
+export default function ProfileScreen({navigation}) {
 
   const {authData, setAuthData} = useContext(AuthContext)
+  const [selectedImage, setSelectedImage] = useState({ localUri: null, remoteUri: null });
 
-  const [description,
-    setDescription] = useState({value: '', error: ''});
-  const [name,
-    setName] = useState('Barbie');
-  const [email,
-    setEmail] = useState('barbie13@gmail.com');
+  const [description,setDescription] = useState({value: '', error: ''});
+  const [race,setRace] = useState({value: '', error: ''});
+  const [bodyType,setBodyType] = useState({value: '', error: ''});
+  const [colorHair,setColorHair] = useState({value: '', error: ''});
+  const [email,setEmail] = useState('barbie13@gmail.com');
+  const [name,setName] = useState('');
+  const [isLoading,setIsLoading] = useState(false);
 
-  const [isEnabled,
-    setIsEnabled] = useState(false);
+  const [isEnabled,setIsEnabled] = useState(false);
+  const [isLoadingImage,setIsLoadingImage] = useState(false);
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
     console.log(!isEnabled);
@@ -55,43 +66,111 @@ export default function RegisterScreen({navigation}) {
     console.log(currentDate);
   };
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+  async function fetchMyAPI() {
+    setIsLoading(true);
+    const doc = await firebase.firestore().collection('entertainers').doc(firebase.auth().currentUser.uid).get();
+    setDescription({value: doc.data().description, error:""})
+    setBodyType({value: doc.data().bodyType, error:""})
+    setColorHair({value: doc.data().colorHair, error:""})
+    setRace({value: doc.data().race, error:""})
+    setName(doc.data().userName)
+    setEmail(doc.data().email)
+    setSelectedImage({localUri: doc.data().thumbnail, error:""})
+    setIsLoading(false);
+  }
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+  useEffect(()  => {
+    fetchMyAPI()   
+  }, []);
 
-  const handleConfirm = (date) => {
-    //console.warn("A date has been picked: ", date);
-    const currentDate = date;
-    setDate(currentDate);
-    hideDatePicker();
-  };
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-  const _onSignUpPressed = () => {
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+       quality: 0.3,
+    });
+    //console.log(pickerResult);
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+    
+    var user = firebase.auth().currentUser;
+    setIsLoadingImage(true);
+    var compImage = (await compressImage(pickerResult.uri, 800)).uri
+    var thumbnail = (await compressImage(pickerResult.uri, 200)).uri
+    const uploadUrl = await uploadImageAsync(compImage, 'profiles', firebase.auth().currentUser.uid);
+    const uploadUrlThumb = await uploadImageAsync(thumbnail, 'thumbnails', firebase.auth().currentUser.uid);
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        updated: Date.now(),
+        profileImage: uploadUrl,
+        thumbnail: uploadUrlThumb,
+      })
+      .then(() => {
+          setSelectedImage({ localUri: compImage, remoteUri: null });
+          setIsLoadingImage(false);
+          console.log("Image successfully Saved!");
+      })
+      .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating Image: ", error);
+      });
+    
+  }
+
+  const _onSignUpPressed = async () => {
     const descriptionError = descriptionValidator(description.value);
-
+    setIsLoading(true);
     if (descriptionError) {
       setDescription({
         ...description,
         error: descriptionError
       });
-
+      setIsLoading(false);
       return;
     }
-    //navigation.navigate('Dashboard');
+    //save changes on firestore
+    var user = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        description: description.value,
+        race: race.value,
+        bodyType: bodyType.value,
+        colorHair: colorHair.value,
+        updated: Date.now(),
+      })
+      .then(() => {
+          console.log("Document successfully Saved!");
+          setIsLoading(false);
+      })
+      .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+          setIsLoading(false);
+      });
   };
 
-  //  _handleOpenWithWebBrowser = () => {
-  //   WebBrowser.openBrowserAsync('https://www.onlyfans.com');
-  // };
+
+
+  useEffect(()  => {
+     console.log("profileScreen", authData);
+  }, [authData]);
+
+  
 
   return (
 
     <BackgroundHome>
-
+       <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
        <Header>
          <Appbar.BackAction color='white' onPress={() => navigation.goBack()} />
          <Appbar.Content title="Profile"  titleStyle={styles.appBarTitle}  />
@@ -104,74 +183,43 @@ export default function RegisterScreen({navigation}) {
         <Appbar.Action icon="image-multiple" color='white' onPress={() => navigation.navigate('UploadPhotos')}/>
       </Header>
 
-     <View style={styles.container}>
+     <View style={authData.dark ? stylesDark.container : styles.container}>
 
        
 
-       <View style={styles.headerContainer}>
-        <View style={styles.userRow}>
-          <Surface style={styles.userImageSurface}>
-            <ProfileImage
-              style={styles.userImage}
-              source={{
-              uri: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
-            }}/>
-          </Surface>
+       <View style={authData.dark ? stylesDark.headerContainer : styles.headerContainer}>
+        <View style={authData.dark ? stylesDark.userRow : styles.userRow}>
+           <TouchableOpacity
+            onPress={openImagePickerAsync} >
+            <Surface style={authData.dark ? stylesDark.userImageSurface : styles.userImageSurface}>
+              {
+              isLoadingImage ? (
+                <>
+                  <View style={authData.dark ? stylesDark.viewActiveIndicator : styles.viewActiveIndicator}>
+                    <ActivityIndicator color={authData.dark ? dark.colors.primary : light.colors.primary} animating size="large" style={authData.dark ? stylesDark.activeIndicator : styles.activeIndicator} />
+                  </View>
+                </>)
+              : <></>}   
+              <ProfileImage
+                style={authData.dark ? stylesDark.userImage : styles.userImage}
+                source={{
+                uri: selectedImage.localUri,
+              }}/>
+              
+            </Surface>
+          </TouchableOpacity>
+         
 
-          <View style={styles.userNameRow}>
-            <Text style={styles.userNameText}>{name}</Text>
+          <View style={authData.dark ? stylesDark.userNameRow : styles.userNameRow}>
+            <Text style={authData.dark ? stylesDark.userNameText : styles.userNameText}>{name}</Text>
           </View>
-          <View style={styles.userBioRow}>
-            <Text style={styles.userBioText}>{email}</Text>
+          <View style={authData.dark ? stylesDark.userBioRow : styles.userBioRow}>
+            {/* <Text style={styles.userBioText}>{email}</Text> */}
           </View>
         </View>
-        {/* <View style={styles.socialRow}>
-          <Surface style={styles.socialIcon}>
-            <Text style={styles.numberText}>23</Text>
-            <Text style={styles.numberTitle}>Following</Text>
-          </Surface>
-
-          <Surface style={styles.socialIcon}>
-            <Text style={styles.numberText}>54</Text>
-            <Text style={styles.numberTitle}>Likes</Text>
-          </Surface>
-
-          <Surface style={styles.socialIcon}>
-            <Text style={styles.numberText}>3</Text>
-            <Text style={styles.numberTitle}>Lives</Text>
-          </Surface>
-
-        </View> */}
       </View>
 
-      <View style={styles.containerDatePickers}>
-              {/* <View style={{
-                width: '80%'
-              }}>
-                  <Text style={styles.label}>Availability</Text>
-              </View>
-
-              <View
-                style={{
-                width: '20%',
-                alignSelf: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1
-              }}>
-                <Switch
-                  trackColor={{
-                  false: "#767577",
-                  true: "#767577"
-                }}
-                  thumbColor={isEnabled
-                  ? theme.colors.primary
-                  : "#f4f3f4"}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}/>
-              </View> */}
-            </View>
+      
 
       <TextInput
         label="Description"
@@ -183,32 +231,71 @@ export default function RegisterScreen({navigation}) {
         error={!!description.error}
         errorText={description.error}/>
 
+      <Text style={authData.dark ? stylesDark.labelDropDown : styles.labelDropDown}>Select your Race</Text>
       <DropDownList
         items={[
         {
-          label: 'Item 1',
-          value: 'item1'
+          label: '',
+          value: ''
+        },{
+          label: 'American Indian or Alaska Native',
+          value: 'American Indian or Alaska Native'
         }, {
-          label: 'Item 2',
-          value: 'item2'
+          label: 'Asian',
+          value: 'Asian'
+        },{
+          label: 'Black or African American',
+          value: 'Black or African American'
+        }, {
+          label: 'Native Hawaiian or Other Pacific Islander',
+          value: 'Native Hawaiian or Other Pacific Islander'
+        }, {
+          label: 'White',
+          value: 'White'
+        }, {
+          label: 'Hispanic or Latino',
+          value: 'Hispanic or Latino'
         }
       ]}
+     
         placeholder="Select your Race"
         zIndex={8000}
         containerStyle={{
         height: 50,
         width: '100%'
       }}
-        onChangeItem={item => console.log(item.label, item.value)}/>
+        defaultValue={race.value}
+        onChangeItem={item => setRace({value: item.value, error: ''})} />
 
+      <Text style={authData.dark ? stylesDark.labelDropDown : styles.labelDropDown}>Select your Body type</Text>
       <DropDownList
         items={[
         {
-          label: 'Item 4',
-          value: 'item5'
-        }, {
-          label: 'Item 5',
-          value: 'item6'
+          label: '',
+          value: ''
+        },{
+          label: 'Pear',
+          value: 'Pear'
+        },
+        {
+          label: 'Diamond',
+          value: 'Diamond'
+        },
+        {
+          label: 'Apple',
+          value: 'Apple'
+        },
+        {
+          label: 'Hourglass',
+          value: 'Hourglass'
+        },
+        {
+          label: 'Straight',
+          value: 'Straight'
+        },
+        {
+          label: 'Full Bust',
+          value: 'Full Bust'
         }
       ]}
         placeholder="Select your Body type"
@@ -217,16 +304,27 @@ export default function RegisterScreen({navigation}) {
         width: '100%'
       }}
         zIndex={7000}
-        onChangeItem={item => console.log(item.label, item.value)}/>
+        defaultValue={bodyType.value}
+        onChangeItem={item => setBodyType({value: item.value, error: ''})} />
 
+      <Text style={authData.dark ? stylesDark.labelDropDown : styles.labelDropDown}>Color of hair</Text>
       <DropDownList
         items={[
         {
-          label: 'Item 4',
-          value: 'item5'
+          label: '',
+          value: ''
+        },{
+          label: 'Black',
+          value: 'Black'
         }, {
-          label: 'Item 5',
-          value: 'item6'
+          label: 'Blond',
+          value: 'Blond'
+        }, {
+          label: 'Brown',
+          value: 'Brown'
+        },{
+          label: 'Red',
+          value: 'Red'
         }
       ]}
         containerStyle={{
@@ -235,119 +333,14 @@ export default function RegisterScreen({navigation}) {
         marginRight: 2
       }}
         placeholder="Color of hair"
-        onChangeItem={item => console.log(item.label, item.value)}/>
+        defaultValue={colorHair.value}
+        onChangeItem={item => setColorHair({value: item.value, error: ''})} />
 
-      <Button mode="contained" onPress={_onSignUpPressed} style={styles.button}>
+      <Button mode="contained" onPress={_onSignUpPressed} style={authData.dark ? stylesDark.button : styles.button}>
         Save
       </Button>
 
-      {/* <View style={{
-        width: '100%'
-      }} zIndex={5000}>
-        <Card style={styles.card} >
-          <Card.Title title="Be live for 24 hrs"/>
-          <Card.Content>
-            <DropDownList
-              items={[
-              {
-                label: 'Item 4',
-                value: 'item5'
-              }, {
-                label: 'Item 5',
-                value: 'item6'
-              }
-            ]}
-              containerStyle={{
-              height: 50,
-              width: '100%',
-              marginLeft: 2
-            }}
-              placeholder="Facility"
-              zIndex={10000}
-              onChangeItem={item => console.log(item.label, item.value)}/>
-            <View style={styles.containerDatePickers}>
-              <View style={{
-                width: '80%'
-              }}>
-
-                <TextInput
-                  label="Date"
-                  returnKeyType="next"
-                  value={date.toLocaleString()}
-                  editable={false}/>
-              </View>
-              <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="date"
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}/>
-              <View
-                style={{
-                width: '20%',
-                alignSelf: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1
-              }}>
-                <IconButton
-                  color={theme.colors.primary}
-                  icon="calendar"
-                  size={40}
-                  onPress={showDatePicker}/>
-              </View>
-            </View>
-
-            <View style={styles.containerDatePickers}>
-              <View style={{
-                width: '80%'
-              }}>
-
-                <TouchableOpacity onPress={() => navigation.navigate('TermsConditions')}>
-                  <Text style={styles.label}>Terms and conditions</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View
-                style={{
-                width: '20%',
-                alignSelf: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1
-              }}>
-                <Switch
-                  trackColor={{
-                  false: "#767577",
-                  true: "#767577"
-                }}
-                  thumbColor={isEnabled
-                  ? theme.colors.primary
-                  : "#f4f3f4"}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}/>
-              </View>
-            </View>
-
-            <Button
-              disabled={!isEnabled}
-              mode="contained"
-              onPress={_onSignUpPressed}
-              style={styles.button}>
-              Pay
-            </Button>
-          </Card.Content>
-
-        </Card>
-      </View> */}
-
-      {/* <Text style={styles.label}> Or </Text>
-      <ButtonsLogin/>
-      <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-          <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
-        </TouchableOpacity>
-      </View> */}
+      
 
      </View>
 
@@ -406,7 +399,7 @@ const styles = StyleSheet.create({
     marginRight: 40
   },
   userBioText: {
-    color: theme.colors.accent,
+    color: light.colors.accent,
     fontSize: 13.5,
     textAlign: 'center'
   },
@@ -427,7 +420,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   userNameText: {
-    color: theme.colors.accent,
+    color: light.colors.text,
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center'
@@ -439,7 +432,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   socialIcon: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: light.colors.primary,
     marginHorizontal: 5,
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -468,11 +461,173 @@ const styles = StyleSheet.create({
     marginTop: 50
   },
   appBarTitle: {
-    color: theme.colors.appBarTitleColor,
+    color: light.colors.appBarTitleColor,
     fontWeight: 'bold'
   },
    appBarTimer: {
-    color: theme.colors.appBarTitleColor,
+    color: light.colors.appBarTitleColor,
     textAlign:'right'
   },
+  labelDropDown:{
+    color:light.colors.primary,
+    textAlign:'left',
+    width:'100%',
+    paddingHorizontal:12,
+  },
+  activeIndicator:{
+    position:'relative', 
+    flex:1 ,
+    justifyContent : 'center', 
+    alignItems:'center', 
+    zIndex:6999, 
+  },
+  viewActiveIndicator:{
+    width:120, 
+    height:120, 
+    backgroundColor:'rgba(0,0,0,0.6)', 
+    position:'absolute',
+    zIndex:6998,
+    borderRadius: 60,
+  }
+});
+
+
+const stylesDark = StyleSheet.create({
+   container: {
+      alignItems     : 'center',
+      justifyContent : 'center',
+      width:'85%',
+    },
+  label: {
+    textAlign: 'right',
+    width: '100%',
+    marginVertical: 15,
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  button: {
+    marginTop: 24
+  },
+  row: {
+    flexDirection: 'row',
+    marginTop: 4
+  },
+  link: {
+    fontWeight: 'bold'
+  },
+  twoDrops: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    width: '100%'
+  },
+  containerDatePickers: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignContent: 'center',
+    justifyContent: 'center'
+  },
+  itemDatePickers: {
+    width: '50%'
+
+  },
+  card: {
+    marginVertical: 10
+  },
+
+  userBioRow: {
+    marginLeft: 40,
+    marginRight: 40
+  },
+  userBioText: {
+    color: dark.colors.accent,
+    fontSize: 13.5,
+    textAlign: 'center'
+  },
+  userImage: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: 10,
+    width: 120
+  },
+  userImageSurface: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: 10,
+    width: 120,
+    elevation: 5
+  },
+  userNameRow: {
+    marginBottom: 10
+  },
+  userNameText: {
+    color: dark.colors.text,
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  userRow: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginBottom: 12
+  },
+  socialIcon: {
+    backgroundColor: dark.colors.primary,
+    marginHorizontal: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+    width: '33.333%',
+    elevation: 5
+  },
+  socialRow: {
+    flexDirection: 'row',
+    marginVertical: 10
+  },
+  numberText: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: 'white'
+  },
+  numberTitle: {
+    textAlign: 'center',
+    color: 'white'
+  },
+  headerContainer: {
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    marginBottom: 10,
+    marginTop: 50
+  },
+  appBarTitle: {
+    color: dark.colors.appBarTitleColor,
+    fontWeight: 'bold'
+  },
+   appBarTimer: {
+    color: dark.colors.appBarTitleColor,
+    textAlign:'right'
+  },
+  labelDropDown:{
+    color:dark.colors.primary,
+    textAlign:'left',
+    width:'100%',
+    paddingHorizontal:12,
+  },
+  activeIndicator:{
+    position:'relative', 
+    flex:1 ,
+    justifyContent : 'center', 
+    alignItems:'center', 
+    zIndex:6999, 
+  },
+  viewActiveIndicator:{
+    width:120, 
+    height:120, 
+    backgroundColor:'rgba(0,0,0,0.6)', 
+    position:'absolute',
+    zIndex:6998,
+    borderRadius: 60,
+  }
 });

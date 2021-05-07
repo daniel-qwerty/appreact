@@ -6,6 +6,9 @@ const data = {
   showTimer: false,
   timer:"asda",
   hasPayment: false,
-  available: false
+  available: false,
+  dark: true,
+  requestTables: [],
+  facilityId:''
 }
 export default data;

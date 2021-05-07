@@ -1,77 +1,59 @@
-import React from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-import BackgroundHome from '../components/BackgroundHome'
-import Header from '../components/Header'
+import Background from '../components/Background'
 import BackButton from '../components/BackButton';
+import { WebView } from 'react-native-webview'
+import firebase from 'firebase';
+import "firebase/firestore";
+import {dark, light} from '../utils/theme'
+import AuthContext from '../auth/context'
 
 export default function TermsServicesScreen({navigation}) {
+
+  const [texthtml, setTexthtml] = useState('');
+  const {authData, setAuthData} = useContext(AuthContext)
+
+   let getTerms = async () => {
+      const doc = await firebase.firestore().collection('configs').doc('legalTexts').get();
+      setTexthtml(doc.data().termsOfService);
+   }
+
+  useEffect(() => {
+    getTerms()
+  }, [getTerms]);
+  
   return (
-    <BackgroundHome>
+    <Background style={{backgroundColor:'white'}} >
+
       
-      <View style={styles.container}>
+      
+      <View style={authData.dark ? stylesDark.container : styles.container}>
+       
         <BackButton goBack={() => navigation.goBack()}/>
-        <Text style={{fontSize: 26,fontWeight: 'bold',marginTop: 50,}}>Terms of Service</Text>
+        <Text style={{fontSize: 26,fontWeight: 'bold',marginTop: 50, color:authData.dark ? dark.colors.text : light.colors.text}}>Terms of Service</Text>
 
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
-
-        <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Privacy Policy</Text>
-
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
-        <Text style={styles.paragraphText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat arcu
-          in massa malesuada pellentesque. Aliquam ligula nisl, pharetra non interdum et,
-          bibendum vitae urna. Aliquam tristique arcu ligula, eleifend aliquet nunc
-          aliquet eget. Etiam tempus quam urna, vel fermentum est rutrum eget. Morbi sit
-          amet urna molestie, congue ante vulputate, rhoncus mi. Donec erat tortor,
-          ultricies ac velit vel, gravida pharetra neque. Nam tellus leo, consectetur eget
-          tincidunt ac, fermentum eget mauris.
-        </Text>
+         <WebView
+          style={{height:'100%', width:'100%', flex:1}}
+          originWhitelist={['*']}
+          source={{ html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body { font-size: '25px'; height:'100%'; background:${authData.dark ? dark.colors.background : light.colors.background}; color:${authData.dark ? dark.colors.text : light.colors.text}}
+                </style>
+              </head>
+              <body>
+              ${texthtml}
+              </body>
+            </html>
+          ` }}
+        />
       </View>
-    </BackgroundHome>
+    </Background>
   );
 }
 
@@ -79,7 +61,24 @@ const styles = StyleSheet.create({
   container: {
     marginVertical: 50,
     width:'85%',
-    height:'100%'
+    height:'100%',
+    backgroundColor: light.colors.background
+  },
+  paragraphText: {
+    textAlign: 'left',
+    fontSize: 12,
+    lineHeight: 26,
+
+    marginBottom: 14
+  }
+});
+
+const stylesDark = StyleSheet.create({
+  container: {
+    marginVertical: 50,
+    width:'85%',
+    height:'100%',
+    backgroundColor: dark.colors.background
   },
   paragraphText: {
     textAlign: 'left',

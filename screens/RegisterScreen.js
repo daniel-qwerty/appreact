@@ -1,5 +1,5 @@
 import React, { memo, useState, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import {Snackbar } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -9,7 +9,8 @@ import TextInput from '../components/TextInput';
 import BackButton from '../components/BackButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
-
+import OverlayLoading from '../components/OverlayLoading';
+import {dark, light} from '../utils/theme'
 import {
   emailValidator,
   passwordValidator,
@@ -17,6 +18,7 @@ import {
 } from '../utils/utils';
 
 import firebase from 'firebase';
+import "firebase/firestore";
 import * as Facebook from 'expo-facebook'
 
 export default function RegisterScreen({navigation}) {
@@ -28,7 +30,8 @@ export default function RegisterScreen({navigation}) {
   const [email, setEmail] = useState({ value: '', error: '' });
   const [phone, setPhone] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
-   const {authData, setAuthData} = useContext(AuthContext)
+  const {authData, setAuthData} = useContext(AuthContext)
+  const [isLoading,setIsLoading] = useState(false);
   
   // const RegisterUser = () => {
   //   setAuthData({
@@ -53,6 +56,7 @@ export default function RegisterScreen({navigation}) {
   };
 
    const signUpWithEmail = async() => {
+    setIsLoading(true);
     await firebase
       .auth()
       .createUserWithEmailAndPassword(email.value, password.value)
@@ -61,7 +65,22 @@ export default function RegisterScreen({navigation}) {
          var user = firebase.auth().currentUser;
 
         user.sendEmailVerification().then(function() {
-          navigation.navigate('VerificationEmail', {email: email.value})
+            const db = firebase.firestore();
+            db.collection("entertainers")
+              .doc(user.uid)
+              .set({
+                email: user.email,
+                userName: name.value,
+                phone: phone.value,
+                profileImage: `https://ui-avatars.com/api/?background=FD91B9&color=fff&size=200&name=${name.value}`,
+                created: Date.now(),
+                likes: 0,
+                dateBirth: null,
+                lastName: null,
+                name: null,
+              });
+              setIsLoading(false);
+              navigation.navigate('VerificationEmail', {email: email.value}) 
           // setSnackBarMessage(`Your registration has been successful, we send you a verification email to ${email.value}`);
           // setSnackBarVisible(!snackBarVisible)
         }).catch(function(error) {
@@ -77,11 +96,13 @@ export default function RegisterScreen({navigation}) {
           if (errorCode == 'auth/weak-password') {
               //this.onLoginFailure.bind(this)('Weak Password!');
               console.log('Weak Password!');
+              setIsLoading(false);
               setSnackBarMessage('Weak Password!');
               setSnackBarVisible(!snackBarVisible)
           } else {
               //this.onLoginFailure.bind(this)(errorMessage);
               console.log(errorMessage);
+              setIsLoading(false);
               setSnackBarMessage(errorMessage);
               setSnackBarVisible(!snackBarVisible)
           }
@@ -90,11 +111,13 @@ export default function RegisterScreen({navigation}) {
 
   const signUpWithFacebook = async() => {
     try {
+      setIsLoading(true);
       Facebook.initializeAsync({appId:'1461728394088946'});
       const { type, token } = await Facebook.logInWithReadPermissionsAsync({
         permissions: ['public_profile'],
       });
       if (type === 'success') {
+        setIsLoading(false);
         await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         const credential = firebase.auth.FacebookAuthProvider.credential(token);
         const facebookProfileData = await firebase.auth().signInWithCredential(credential);
@@ -108,14 +131,18 @@ export default function RegisterScreen({navigation}) {
 
   return (
     <Background>
-      <View style={styles.container}>
+      <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
+       <ScrollView style={{
+        height: '100%', width:'100%', paddingVertical:20}}>
+         
+      <View style={authData.dark ? stylesDark.container : styles.container}>
         <BackButton goBack={() => navigation.navigate('Welcome')} />
       <Logo/>
 
-      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14,}}>Create Account</Text>
-
-      <TextInput
-        label="Name"
+      <Text style={{fontSize: 26,fontWeight: 'bold',paddingVertical: 14, color:authData.dark ? dark.colors.text : light.colors.text}}>Create Account</Text>
+     
+          <TextInput
+        label="User Name"
         returnKeyType="next"
         value={name.value}
         onChangeText={text => setName({ value: text, error: '' })}
@@ -146,7 +173,7 @@ export default function RegisterScreen({navigation}) {
         autoCapitalize="none"
         autoCompleteType="tel"
         textContentType="telephoneNumber"
-        keyboardType="default"
+        keyboardType="numbers-and-punctuation"
       />
 
       <TextInput
@@ -159,20 +186,24 @@ export default function RegisterScreen({navigation}) {
         secureTextEntry
       />
 
-      <Button mode="contained" onPress={_onSignUpPressed} style={styles.button}>
+      <Button mode="contained" onPress={_onSignUpPressed} style={authData.dark ? stylesDark.button : styles.button}>
         Sign Up
       </Button>
       {/* <Text style={styles.label}> Or </Text> */}
-      <Button mode="contained" onPress={signUpWithFacebook} style={styles.button}>
+      <Button mode="contained" onPress={signUpWithFacebook} style={authData.dark ? stylesDark.button : styles.button}>
         Facebook
       </Button>
       {/* <ButtonsLogin  /> */}
-      <View style={styles.row}>
+      <View style={authData.dark ? stylesDark.row : styles.row}>
         <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
-          <Text style={styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
+          <Text style={authData.dark ? stylesDark.label : styles.label}>By signing up you agree to our Terms of Service and Privacy Policy </Text>
         </TouchableOpacity>
       </View>
+      
       </View>
+
+      </ScrollView>
+      
       <Snackbar
         visible={snackBarVisible}
         onDismiss={onDismissSnackBar}
@@ -192,12 +223,15 @@ export default function RegisterScreen({navigation}) {
 
 const styles = StyleSheet.create({
   container: {
-      alignItems     : 'center',
-      justifyContent : 'center',
-      width:'85%',
-    },
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width:'85%',
+    flex:1
+  },
   label: {
-   fontWeight:'600'
+   fontWeight:'600',
+   color: light.colors.text
   },
   button: {
     marginTop: 24,
@@ -205,6 +239,33 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     marginTop: 4,
+    marginBottom:50
+  },
+  link: {
+    fontWeight: 'bold',
+   
+  },      
+});
+
+const stylesDark = StyleSheet.create({
+  container: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width:'85%',
+    flex:1
+  },
+  label: {
+   fontWeight:'600',
+   color: dark.colors.text
+  },
+  button: {
+    marginTop: 24,
+  },
+  row: {
+    flexDirection: 'row',
+    marginTop: 4,
+    marginBottom:50
   },
   link: {
     fontWeight: 'bold',

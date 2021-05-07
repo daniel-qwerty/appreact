@@ -1,16 +1,24 @@
-import React, { memo, useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import {theme} from '../utils/theme'
+import React, { useContext, useEffect } from 'react';
+import { StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import {dark, light} from '../utils/theme'
 import {Appbar} from 'react-native-paper';
 import * as WebBrowser from 'expo-web-browser';
+import AuthContext from '../auth/context'
 
 
-const Header = ({ children, props }) => (
-  <Appbar.Header {...props} style={{width:'100%',}}>
-    {children}
-     {/* <Appbar.Action color={theme.colors.appBarIconColor} icon="crown" onPress={() => { WebBrowser.openBrowserAsync('https://www.onlyfans.com')}} /> */}
-  </Appbar.Header>
-);
+export default function Header({children, props}) {   
+  const {authData, setAuthData} = useContext(AuthContext)
+
+  return(
+    <Appbar.Header {...props} style={{width:'100%',}}>
+      {children}
+       <TouchableOpacity onPress={() => { WebBrowser.openBrowserAsync('https://www.myminks.com')}} >
+           <Image style={{width:30, height:30, marginRight:5}} source={require('../assets/ButtonIcon.png')} />
+       </TouchableOpacity>
+    </Appbar.Header>
+  )
+  
+}
 
 const styles = StyleSheet.create({
   header: {
@@ -19,5 +27,3 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
 });
-
-export default memo(Header);

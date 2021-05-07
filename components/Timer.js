@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
   },
   appBarTimer: {
     color: theme.colors.appBarTitleColor,
-    textAlign: 'right'
+    textAlign: 'right',
+    fontSize:12
   }
 });

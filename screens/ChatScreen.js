@@ -150,7 +150,7 @@ export default class Chat extends Component {
         <View style={{
           flex: 1
         }}>
-          <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboard}>
             <FlatList
               style={styles.list}
               extraData={this.state}

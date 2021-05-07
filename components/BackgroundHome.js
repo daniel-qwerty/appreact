@@ -1,35 +1,41 @@
-import React, {memo} from 'react';
+import React, {useContext} from 'react';
 import {ImageBackground, StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-//  let Props = {   children: React.ReactNode };
+import { dark, light } from '../utils/theme';
+import AuthContext from '../auth/context';
 
-const BackgroundHome = ({children, Props}) => (
-  <ImageBackground
-    // source={require('../assets/images/background_dot.png')}
-    resizeMode="repeat"
-    style={styles.background}>
-    <SafeAreaView style={{
-      height: '100%'
-    }}>
-      <ScrollView style={{
-        height: '100%'
-      }}>
-        <KeyboardAvoidingView style={styles.container}>
 
-          {children}
+  export default function BackgroundHome({children, Props}) { 
 
-        </KeyboardAvoidingView>
-      </ScrollView>
+  const {authData, setAuthData} = useContext(AuthContext)
+    return(
+      <ImageBackground
+        // source={require('../assets/images/background_dot.png')}
+        resizeMode="repeat"
+        style={authData.dark ? stylesDark.background : styles.background}>
+        <SafeAreaView style={{
+          height: '100%'
+        }}>
+          <ScrollView style={{
+            height: '100%'
+          }}>
+            <KeyboardAvoidingView style={authData.dark ? stylesDark.container : styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
 
-    </SafeAreaView>
-  </ImageBackground>
-);
+              {children}
+
+            </KeyboardAvoidingView>
+          </ScrollView>
+
+        </SafeAreaView>
+      </ImageBackground>
+    )
+  }
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
     width: '100%',
-    backgroundColor: 'white'
+    backgroundColor: light.colors.background
   },
   container: {
     flex: 1,
@@ -42,4 +48,19 @@ const styles = StyleSheet.create({
   }
 });
 
-export default memo(BackgroundHome);
+const stylesDark = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: dark.colors.background
+  },
+  container: {
+    flex: 1,
+    padding: 0,
+    width: '100%',
+    maxWidth: '100%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+});

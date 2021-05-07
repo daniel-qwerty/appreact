@@ -110,6 +110,7 @@ export default function BillingScreen({navigation}) {
           right={props => <Text
           {...props}
           style={{
+          color: theme.colors.primary,
           fontSize: 25,
           marginVertical: 10,
           marginHorizontal: 5
@@ -127,7 +128,7 @@ export default function BillingScreen({navigation}) {
 
       <Appbar.Header style={{width:'100%'}}>
       <Appbar.BackAction onPress={() => navigation.goBack()} />
-      <Appbar.Content title="My Biiling"  />
+      <Appbar.Content title="Financial information"  />
       <Appbar.Action icon="calendar" onPress={showFilterDates} />
     </Appbar.Header>
 
@@ -137,36 +138,37 @@ export default function BillingScreen({navigation}) {
         ? (
           <Card style={styles.cardDates}>
             <Card.Content >
-              <TextInputForDate
-                label="From"
+              <View style={{width:'100%'}}> 
+                <TextInputForDate
+                label="from "
                 returnKeyType="go"
                 value={dateFrom
                 ? dateFrom.toLocaleDateString("en-US")
                 : ''}
-                editable={true}
-                onFocus={showDatePickerFrom}/>
+                editable={false}
+                />
+                <IconButton  color={theme.colors.primary} icon="calendar" size={30} style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                }} />
+              </View>
 
-              <TextInputForDate
-                label="To"
+             <View style={{width:'100%'}}> 
+                <TextInputForDate
+                label="To "
                 returnKeyType="go"
                 value={dateTo
                 ? dateTo.toLocaleDateString("en-US")
                 : ''}
-                editable={true}
-                onFocus={showDatePickerTo}/>
-
-              {/* <DateTimePickerModal
-                isVisible={isDatePickerVisibledDateTo}
-                mode="date"
-                onConfirm={handleConfirmTo}
-                onCancel={hideDatePickerTo}/>
-
-              <DateTimePickerModal
-                isVisible={isDatePickerVisibledDateFrom}
-                mode="date"
-                onConfirm={handleConfirmFrom}
-                onCancel={hideDatePickerFrom}/> */}
-
+                editable={false}
+                />
+                <IconButton  color={theme.colors.primary} icon="calendar" size={30} style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                }} />
+              </View>
             </Card.Content>
           </Card>
         )
@@ -177,11 +179,12 @@ export default function BillingScreen({navigation}) {
           <DropDownList
             items={[
             {
-              label: 'Item 4',
-              value: 'item5'
-            }, {
-              label: 'Item 5',
-              value: 'item6'
+              label: 'Outgoing',
+              value: 'Outgoing'
+            },
+            {
+              label: 'Incoming',
+              value: 'Incoming'
             }
           ]}
             containerStyle={{
@@ -189,7 +192,6 @@ export default function BillingScreen({navigation}) {
             width: '100%'
           }}
           zIndex={7000}
-            placeholder="Color of eyes"
             onChangeItem={item => console.log(item.label, item.value)}/>
         </Card.Content>
       </Card>
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   itemContainer: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.inputBackground,
     width: '100%',
     borderRadius: 25,
     borderWidth: 1,
@@ -243,7 +245,8 @@ const styles = StyleSheet.create({
   cardDates: {
     marginVertical: 10,
     height: 150,
-    width: '85%'
+    width: '85%',
+    backgroundColor: theme.colors.inputBackground
   },
   cardFilter: {
     marginVertical: 10,

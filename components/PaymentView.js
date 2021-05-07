@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext} from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { WebView } from 'react-native-webview'
-import {theme} from '../utils/theme'
+import {dark, light} from '../utils/theme'
 import AuthContext from '../auth/context'
 import Modal from 'react-native-modal';
 import Button from '../components/Botton';
 import BigTimer from '../components/BigTimer'
 import {IconButton, Surface} from 'react-native-paper';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from 'firebase';
+import "firebase/firestore";
 
 const STRIPE_PK = 'pk_test_gkEAGFAdUkkaZtIHSXbW1jCm00aS7wS0PA'
 
@@ -26,23 +28,49 @@ const PaymentView = (props) => {
   };
 
   const changeModalStatus = () => {
-    if(authData.available)
+    if(authData.available){
         setAuthData({...authData,  available: false})
-    else
-       setAuthData({...authData,  available: true})
+        changeStatus(false);
+    }
+        
+    else {
+        setAuthData({...authData,  available: true})
+        changeStatus(true);
+    }
+       
 
     setShowStatusModal(false);
   };
   
   
 
-  const showModalPaySuccess = () => {
+  const showModalPaySuccess = async () => {
     setAuthData({...authData, showModalPaySuccess: true, hasPayment: true, available: true})
   };
 
-  const closeModalPaySuccess = () => {
+  const closeModalPaySuccess = async () => {
     setAuthData({...authData, showModalPaySuccess: false, showTimer: true});
+    await AsyncStorage.setItem('hasPayment', 'true'); 
   };
+
+ function changeStatus (status) {
+      var user = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        availability: status,
+      })
+      .then(() => {
+          console.log("Document successfully Saved!");
+         
+      })
+      .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+    
+      });
+  }
 
   function stop(){
     setAuthData({...authData, timer:"stop", });
@@ -73,14 +101,14 @@ const PaymentView = (props) => {
                 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
                 <script src="https://js.stripe.com/v3/"></script>
                 <style>
-                
+                body { background:${authData.dark ? dark.colors.background : light.colors.background}; color:${authData.dark ? dark.colors.text : light.colors.text}}
                 .card-holder{
                     display: flex;
                     flex-direction: column;
                     height: 200px;
                     justify-content: space-around;
                     background-color: 'white';
-                    background-image: linear-gradient(to right top, #262829, #3d4040, #575958, #727472, #8f8f8d);
+                    background-image: linear-gradient(to right top, #e40082, #e20181, #e10281, #df0280, #de037f);
                     border-radius: 20px;
                     padding: 10px;
                     padding-top: 20px;
@@ -104,6 +132,7 @@ const PaymentView = (props) => {
                     border: none;
                 
                 }
+                
                 input {
                     outline:none;
                     color: #FFF;
@@ -128,6 +157,7 @@ const PaymentView = (props) => {
                     }
                     .card-errors{
                         color: red;
+                        margin-top: 30px
                     }
                     .pay-btn{
                         display: flex;
@@ -137,7 +167,7 @@ const PaymentView = (props) => {
                         
                     }
                     .btn-pay{
-                        background-color:${theme.colors.primary};
+                        background-color:${authData.dark ? dark.colors.primary : light.colors.primary};
                         height: 50px;
                     }
                 
@@ -317,38 +347,38 @@ const PaymentView = (props) => {
     const onMessage = (event) => {
         const { data } =  event.nativeEvent;
          console.log(data)
-         onCheckStatus(data)
-         if(JSON.parse(data).error.code === 'api_key_expired'){
-             showModalPaySuccess()
-         }
+        // onCheckStatus(data)
+        // if(JSON.parse(data).error.code === 'api_key_expired'){
+              showModalPaySuccess()
+        // }
     }
 
     return (
     <View style={{backgroundColor:'white', height:'100%'}}>     
         {authData.hasPayment ? (
           <>
-            <View style={styles.container}>
+            <View style={authData.dark ? stylesDark.container : styles.container}>
                 
                  {authData.available ? (
                     <>
-                         <IconButton  icon="eye-outline" size={60} style={styles.iconAvailably} />
+                         <IconButton icon="eye-outline" size={60} color={authData.dark ? dark.colors.text : light.colors.text } style={authData.dark ? stylesDark.iconAvailably : styles.iconAvailably} />
                     </>
                     ) : 
                     <>
-                         <IconButton  icon="eye-off-outline" size={60} style={styles.iconAvailably} />
+                         <IconButton  icon="eye-off-outline" size={60} color={authData.dark ? dark.colors.text : light.colors.text } style={authData.dark ? stylesDark.iconAvailably : styles.iconAvailably} />
                     </>}
-                <Surface style={styles.surface}>
+                <Surface style={authData.dark ? stylesDark.surface : styles.surface}>
                     <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
                     {authData.available ? (
                     <>
-                        <Text style={styles.textAvailable}>YOUR STATUS IS: AVAILABLE</Text>
+                        <Text style={authData.dark ? stylesDark.textAvailable : styles.textAvailable}>YOUR STATUS IS: AVAILABLE</Text>
                     </>
                     ) : 
                     <>
-                        <Text style={styles.textAvailable}>YOUR STATUS IS: NOT AVAILABLE</Text>
+                        <Text style={authData.dark ? stylesDark.textAvailable : styles.textAvailable}>YOUR STATUS IS: NOT AVAILABLE</Text>
                     </>}
                 </Surface>
-                <Button mode="contained" style={styles.buttonAvailably} onPress={openModalStatus}>
+                <Button mode="contained" style={authData.dark ? stylesDark.buttonAvailably : styles.buttonAvailably} onPress={openModalStatus}>
                     Change Status
                 </Button>
             </View>
@@ -366,17 +396,17 @@ const PaymentView = (props) => {
         </>}
    
 
-    <View style={styles.containerModal}>
+    <View style={authData.dark ? stylesDark.containerModal : styles.containerModal}>
         <Modal
           backdropOpacity={0.3}
           isVisible={authData.showModalPaySuccess}
           onBackdropPress={closeModalPaySuccess}
-          style={styles.contentView}
+          style={authData.dark ? stylesDark.contentView : styles.contentView}
         >
-          <View style={styles.content}>
-            <Text style={styles.contentTitle}>Payment Successful 👍!</Text>
-            <Text>now you're available for 24 hrs</Text>
-            <Button mode="contained" onPress={closeModalPaySuccess} style={styles.button} >
+          <View style={authData.dark ? stylesDark.content : styles.content}>
+            <Text style={authData.dark ? stylesDark.contentTitle : styles.contentTitle}>Payment Successful 👍!</Text>
+            <Text style={{color: authData.dark ? dark.colors.text : light.colors.text}}>now you're available for 24 hrs</Text>
+            <Button mode="contained" onPress={closeModalPaySuccess} style={authData.dark ? stylesDark.button : styles.button} >
                 Ok
             </Button>
           </View>
@@ -385,23 +415,23 @@ const PaymentView = (props) => {
           backdropOpacity={0.3}
           isVisible={showStatusModal}
           onBackdropPress={closeModalStatus}
-          style={styles.contentView}
+          style={authData.dark ? stylesDark.contentView : styles.contentView}
         >
-          <View style={styles.content}>
-            <Text style={styles.contentTitle}>Status</Text>
+          <View style={authData.dark ? stylesDark.content : styles.content}>
+            <Text style={authData.dark ? stylesDark.contentTitle : styles.contentTitle}>Status</Text>
             
             {authData.available ? (
             <>
-                <Text>Change your status to not available❓</Text>
+                <Text style={authData.dark ? stylesDark.contentTitle : styles.contentTitle} >Change your status to not available❓</Text>
             </>
             ) : 
             <>
-                <Text>Change your status to available❓</Text>
+                <Text style={authData.dark ? stylesDark.contentTitle : styles.contentTitle}>Change your status to available❓</Text>
             </>}
-            <Button mode="contained" onPress={changeModalStatus} style={styles.button} >
+            <Button mode="contained" onPress={changeModalStatus} style={authData.dark ? stylesDark.button : styles.button} >
                 YES
             </Button>
-            <Button mode="contained" onPress={closeModalStatus} style={styles.button} >
+            <Button mode="contained" onPress={closeModalStatus} style={authData.dark ? stylesDark.button : styles.button} >
                 NO
             </Button>
           </View>
@@ -409,96 +439,182 @@ const PaymentView = (props) => {
       </View>
     </View>
     );
-
-
-
-
-
 }
- 
 
  export { PaymentView }
- const styles = StyleSheet.create({
-container: {
-  flex: 1,
-  alignItems     : 'center',
-      
-},
-navigation: {
-  flex: 2,
-  backgroundColor: 'white'
-},
-body: {
-  flex: 10,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: 'yellow'
-},
-footer: {
-  flex: 1,
-  backgroundColor: 'cyan'
-},
-appBarTitle: {
-    color: theme.colors.appBarTitleColor,
-    fontWeight: 'bold'
-  },
-   appBarTimer: {
-    color: theme.colors.appBarTitleColor,
-    textAlign:'right'
-  },
-   content: {
-    backgroundColor: 'white',
-    padding: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopRightRadius: 17,
-    borderTopLeftRadius: 17,
-  },
-  contentTitle: {
-    fontSize: 20,
-    marginBottom: 12,
-  },
-  contentView: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
-	buttonStyle: {
-    height: 90,
-    width: 90,
-    backgroundColor: theme.colors.accent,
-    borderRadius: 100
-  },
-  button: {
-    marginTop: 12,
-  },
-  surface: {
-    backgroundColor: theme.colors.primary,
-    width: '85%',
-    height: 200,
-    elevation: 3,
-    borderRadius: 15,
-    paddingHorizontal:25,
-    paddingVertical:55
-  },
-  buttonAvailably: {
-    marginTop: -25,
-    width: '50%',
-    elevation:6,
-    backgroundColor: 'white',
-    color:'white'
-  },
-  iconAvailably:{
-    marginTop:0,
-    backgroundColor:'white',
-    position:'relative',
-    top:50,
-    zIndex:7000
-  },
-  textAvailable:{
-      color:'white',
-      fontSize: 16,
-      fontWeight:'bold',
-      textAlign:'center',
-      marginTop:30
-  }
+
+ const stylesDark = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems     : 'center',
+        backgroundColor: dark.colors.background
+        
+    },
+    navigation: {
+        flex: 2,
+        backgroundColor: 'white'
+    },
+    body: {
+        flex: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'yellow'
+    },
+    footer: {
+        flex: 1,
+        backgroundColor: 'cyan'
+    },
+    appBarTitle: {
+        color: dark.colors.appBarTitleColor,
+        fontWeight: 'bold'
+    },
+    appBarTimer: {
+        color: dark.colors.appBarTitleColor,
+        textAlign:'right'
+    },
+    content: {
+        backgroundColor: dark.colors.modalBackground,
+        padding: 15,
+        justifyContent:'center',
+        alignItems: 'center',
+        borderTopRightRadius: 17,
+        borderTopLeftRadius: 17,
+    },
+    contentTitle: {
+        fontSize: 20,
+        marginBottom: 12,
+        color: dark.colors.text
+    },
+    
+    contentView: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+        buttonStyle: {
+        height: 90,
+        width: 90,
+        backgroundColor: dark.colors.accent,
+        borderRadius: 100
+    },
+    button: {
+        marginTop: 12,
+    },
+    surface: {
+        backgroundColor: dark.colors.primary,
+        width: '85%',
+        height: 200,
+        elevation: 3,
+        borderRadius: 15,
+        paddingHorizontal:25,
+        paddingVertical:55
+    },
+    buttonAvailably: {
+        marginTop: -25,
+        width: '50%',
+        elevation:6,
+        backgroundColor: dark.colors.inputBackground,
+
+    },
+    iconAvailably:{
+        marginTop:0,
+        backgroundColor:dark.colors.inputBackground,
+        position:'relative',
+        top:50,
+        zIndex:7000,
+    },
+    textAvailable:{
+        color:'white',
+        fontSize: 16,
+        fontWeight:'bold',
+        textAlign:'center',
+        marginTop:30
+    }
+});
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems     : 'center',
+        backgroundColor: light.colors.background
+        
+    },
+    navigation: {
+        flex: 2,
+        backgroundColor: 'white'
+    },
+    body: {
+        flex: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'yellow'
+    },
+    footer: {
+        flex: 1,
+        backgroundColor: 'cyan'
+    },
+    appBarTitle: {
+        color: light.colors.appBarTitleColor,
+        fontWeight: 'bold'
+    },
+    appBarTimer: {
+        color: light.colors.appBarTitleColor,
+        textAlign:'right'
+    },
+    content: {
+        backgroundColor: light.colors.modalBackground,
+        padding: 15,
+        justifyContent:'center',
+        alignItems: 'center',
+        borderTopRightRadius: 17,
+        borderTopLeftRadius: 17,
+    },
+    contentTitle: {
+        fontSize: 20,
+        marginBottom: 12,
+        color: light.colors.text
+    },
+    
+    contentView: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+        buttonStyle: {
+        height: 90,
+        width: 90,
+        backgroundColor: light.colors.accent,
+        borderRadius: 100
+    },
+    button: {
+        marginTop: 12,
+    },
+    surface: {
+        backgroundColor: light.colors.primary,
+        width: '85%',
+        height: 200,
+        elevation: 3,
+        borderRadius: 15,
+        paddingHorizontal:25,
+        paddingVertical:55
+    },
+    buttonAvailably: {
+        marginTop: -25,
+        width: '50%',
+        elevation:6,
+        backgroundColor: light.colors.inputBackground,
+
+    },
+    iconAvailably:{
+        marginTop:0,
+        backgroundColor:light.colors.inputBackground,
+        position:'relative',
+        top:50,
+        zIndex:7000,
+    },
+    textAvailable:{
+        color:'white',
+        fontSize: 16,
+        fontWeight:'bold',
+        textAlign:'center',
+        marginTop:30
+    }
 });

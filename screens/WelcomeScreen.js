@@ -9,6 +9,7 @@ import Button from '../components/Botton'
 import Header from '../components/Header'
 import firebase from 'firebase';
 import AuthContext from '../auth/context'
+import {dark, light} from '../utils/theme'
 
 export default function RegisterScreen({navigation}) {
 
@@ -16,9 +17,9 @@ export default function RegisterScreen({navigation}) {
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        //navigation.navigate('Login');
-        //setAuthData({...authData, islogged: true})
+      if (user && user.emailVerified) {
+        //console.log(user);
+        setAuthData({...authData, islogged: true})
       } else {
         navigation.navigate('Login');
       }
@@ -27,22 +28,16 @@ export default function RegisterScreen({navigation}) {
 
   return (
     <Background >
-      <View style={styles.container}>
+      <View style={authData.dark ? stylesDark.container : styles.container}>
         <Logo/>
-        <Text
-          style={{
-          fontSize: 26,
-          fontWeight: 'bold',
-          paddingVertical: 14
-        }}>Entertainer</Text>
-
+        <Text style={authData.dark ? stylesDark.title : styles.title}>Entertainer</Text>
         <Paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing.
         </Paragraph>
         <Button mode="contained" onPress={() => navigation.navigate('Login')}>
           Login
         </Button>
-        <Button mode="outlined" onPress={() => navigation.navigate('Register')}>
+        <Button mode="contained" onPress={() => navigation.navigate('Register')}>
           Sign Up
         </Button>
       </View>
@@ -54,9 +49,31 @@ export default function RegisterScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: light.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     width: '85%'
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    paddingVertical: 14,
+    color: light.colors.text
+  }
+});
+
+const stylesDark = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: dark.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '85%'
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    paddingVertical: 14,
+    color: dark.colors.text
   }
 });
