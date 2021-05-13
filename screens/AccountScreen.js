@@ -64,22 +64,10 @@ export default function AccountScreen({navigation}) {
     
     setIsLoading(true);
     if (emailError || nameError || lastNameError || phoneError) {
-      setName({
-        ...name,
-        error: nameError
-      });
-      setName({
-        ...lastName,
-        error: lastNameError
-      });
-      setEmail({
-        ...email,
-        error: emailError
-      });
-       setPhone({
-        ...phone,
-        error: phoneError
-      });
+      setName({...name,error: nameError});
+      setLastName({...lastName,error: lastNameError});
+      setEmail({...email,error: emailError});
+      setPhone({...phone,error: phoneError});
       setIsLoading(false);
       return;
     }
@@ -117,7 +105,6 @@ export default function AccountScreen({navigation}) {
   async function fetchMyAPI() {
     setIsLoading(true);
     const doc = await firebase.firestore().collection('entertainers').doc(firebase.auth().currentUser.uid).get();
-    console.log(doc.data());
     setName({value: doc.data().name, error: ''})
     setLastName({value: doc.data().lastName, error: ''})
     setEmail({value: doc.data().email, error: ''})

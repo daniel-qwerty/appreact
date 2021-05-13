@@ -49,7 +49,8 @@ const PaymentView = (props) => {
   };
 
   const closeModalPaySuccess = async () => {
-    setAuthData({...authData, showModalPaySuccess: false, showTimer: true});
+    //setAuthData({...authData, showModalPaySuccess: false,hasPayment: true, showTimer: true, islogged: false});
+    setAuthData({...authData, showModalPaySuccess: false,hasPayment: true, showTimer: true});
     await AsyncStorage.setItem('hasPayment', 'true'); 
   };
 
@@ -347,10 +348,10 @@ const PaymentView = (props) => {
     const onMessage = (event) => {
         const { data } =  event.nativeEvent;
          console.log(data)
-        // onCheckStatus(data)
-        // if(JSON.parse(data).error.code === 'api_key_expired'){
+        onCheckStatus(data)
+        //if(JSON.parse(data).error.code === 'api_key_expired'){
               showModalPaySuccess()
-        // }
+       // }
     }
 
     return (

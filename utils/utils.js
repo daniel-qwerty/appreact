@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';  
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const emailValidator = (email) => {
   const re = /\S+@\S+\.\S+/;
@@ -34,6 +35,11 @@ export const descriptionValidator = (description) => {
 
 export const phoneValidator = (phone) => {
   if (!phone || phone.length <= 0) return 'Phone cannot be empty.';
+  return '';
+};
+
+export const facilityValidator = (facility) => {
+  if (!facility || facility.length <= 0) return 'Facility cannot be empty.';
   return '';
 };
 
@@ -87,6 +93,20 @@ export const uploadImageAsync = async (uri, directory, name) =>{
     );
 
     return  { name: `${Date.now()}.${format}`, type: `image/${format}`, ...result };
+    // return: { name, type, width, height, uri }
+  };
+
+  export const saveToCache = async (name, data, hours) => { 
+    var value = {data: data, expires: Date.now() + (hours*60*60*1000)}
+    await AsyncStorage.setItem(name, JSON.stringify(value))
+   // return  value
+    // return: { name, type, width, height, uri }
+  };
+
+  export const getToCache = async (name) => { 
+    var value = {data: data, expires: Date.now() + (hours*60*60*1000)}
+    await AsyncStorage.setItem(name, JSON.stringify(value))
+   // return  value
     // return: { name, type, width, height, uri }
   };
 

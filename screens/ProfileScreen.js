@@ -9,7 +9,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 
-import {Card, Title, Surface, IconButton, Appbar} from 'react-native-paper';
+import {Card, Title, Surface, IconButton, Appbar, Snackbar} from 'react-native-paper';
 import BackgroundHome from '../components/BackgroundHome';
 import ProfileImage from '../components/ProfileImage';
 import Header from '../components/Header';
@@ -46,9 +46,12 @@ export default function ProfileScreen({navigation}) {
   const [email,setEmail] = useState('barbie13@gmail.com');
   const [name,setName] = useState('');
   const [isLoading,setIsLoading] = useState(false);
+  const [snackBarVisible, setSnackBarVisible] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
 
   const [isEnabled,setIsEnabled] = useState(false);
   const [isLoadingImage,setIsLoadingImage] = useState(false);
+  const onDismissSnackBar = () => setSnackBarVisible(false);
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
     console.log(!isEnabled);
@@ -149,7 +152,9 @@ export default function ProfileScreen({navigation}) {
         updated: Date.now(),
       })
       .then(() => {
-          console.log("Document successfully Saved!");
+          console.log("Profile successfully Saved!");
+          setSnackBarMessage('Profile successfully Saved!');
+          setSnackBarVisible(!snackBarVisible)
           setIsLoading(false);
       })
       .catch((error) => {
@@ -340,11 +345,25 @@ export default function ProfileScreen({navigation}) {
         Save
       </Button>
 
+      <Snackbar
+        visible={snackBarVisible}
+        onDismiss={onDismissSnackBar}
+        duration={2000}
+        action={{
+          label: 'X',
+          onPress: () => {
+            // Do something
+            console.log('object');
+          },
+        }}>
+        {snackBarMessage}
+      </Snackbar>
+
       
 
      </View>
 
-      
+       
 
       
     </BackgroundHome>

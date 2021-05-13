@@ -350,12 +350,6 @@ export default function UploadPhotos({navigation}) {
             </View>
             <View style={authData.dark ? stylesDark.cardContent : styles.cardContent}> 
               {/* <Text style={styles.title}>{item.type}</Text>  */}
-              {item.favorite ? (<>
-              <IconButton onPress={() => setFavoriteMedia(item)} icon="star" size={20} color={authData.dark ? dark.colors.primary : light.colors.primary} style={authData.dark ? stylesDark.iconLike : styles.iconLike}/>
-              </>) : <>
-              <IconButton onPress={() => setFavoriteMedia(item)} icon="star-outline" size={20} color={authData.dark ? dark.colors.primary : light.colors.primary} style={authData.dark ? stylesDark.iconLike : styles.iconLike}/>
-              </>}
-
               {item.tag ? (<>
               <IconButton onPress={() => openTagModal(item)} icon="tag-heart-outline" size={20} color={authData.dark ? dark.colors.primary : light.colors.primary} style={authData.dark ? stylesDark.iconTag : styles.iconTag}/>
               <Text>sad</Text>

@@ -1,4 +1,4 @@
-import React, { memo, useState, useContext } from 'react';
+import React, { memo, useState, useContext,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import {Snackbar } from 'react-native-paper';
 import Background from '../components/Background';
@@ -10,16 +10,19 @@ import BackButton from '../components/BackButton';
 import ButtonsLogin from '../components/ButtonsLogin'
 import AuthContext from '../auth/context'
 import OverlayLoading from '../components/OverlayLoading';
+import DropDownList from '../components/DropDownList';
 import {dark, light} from '../utils/theme'
 import {
   emailValidator,
   passwordValidator,
   nameValidator,
+  facilityValidator,
 } from '../utils/utils';
 
 import firebase from 'firebase';
 import "firebase/firestore";
 import * as Facebook from 'expo-facebook'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen({navigation}) {
 
@@ -30,25 +33,42 @@ export default function RegisterScreen({navigation}) {
   const [email, setEmail] = useState({ value: '', error: '' });
   const [phone, setPhone] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
+  const [facility, setFacility] = useState({ value: '', error: '' });
   const {authData, setAuthData} = useContext(AuthContext)
   const [isLoading,setIsLoading] = useState(false);
+  const [facilities,setFacilities] = useState([]);
   
-  // const RegisterUser = () => {
-  //   setAuthData({
-  //     ...authData, 
-  //     islogged: true
-  //   })
-  // };
-
+  
+  const getDataFacilities = async () => {
+    try {
+      const value = await AsyncStorage.getItem('facilities')
+   
+      if(value !== null) {
+        let data = JSON.parse(value);
+        
+        let listData = []
+        data.data.forEach(function (doc) {
+            console.log(doc.name);
+            listData.push({label: doc.name, value: doc.id})
+        })
+        setFacilities(listData)
+        // value previously stored
+      }
+    } catch(e) {
+      // error reading value
+    }
+  }
   const _onSignUpPressed = () => {
     const nameError = nameValidator(name.value);
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
+    const facilityError = facilityValidator(facility.value);
 
     if (emailError || passwordError || nameError) {
       setName({ ...name, error: nameError });
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
+      setFacility({ ...facility, error: facilityError });
       return;
     }
 
@@ -78,6 +98,7 @@ export default function RegisterScreen({navigation}) {
                 dateBirth: null,
                 lastName: null,
                 name: null,
+                facility: facility.value
               });
               setIsLoading(false);
               navigation.navigate('VerificationEmail', {email: email.value}) 
@@ -129,6 +150,10 @@ export default function RegisterScreen({navigation}) {
     }
   }
 
+  useEffect(()  => {
+    getDataFacilities()
+  }, []);  
+
   return (
     <Background>
       <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
@@ -164,6 +189,16 @@ export default function RegisterScreen({navigation}) {
       />
 
       <TextInput
+        label="Password"
+        returnKeyType="done"
+        value={password.value}
+        onChangeText={text => setPassword({ value: text, error: '' })}
+        error={!!password.error}
+        errorText={password.error}
+        secureTextEntry
+      />
+
+      {/* <TextInput
         label="Phone"
         returnKeyType="next"
         value={phone.value}
@@ -174,25 +209,32 @@ export default function RegisterScreen({navigation}) {
         autoCompleteType="tel"
         textContentType="telephoneNumber"
         keyboardType="numbers-and-punctuation"
-      />
+      /> */}
 
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password.value}
-        onChangeText={text => setPassword({ value: text, error: '' })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
+      {/* <Text style={authData.dark ? stylesDark.labelDropDown : styles.labelDropDown}>Select your Race</Text> */}
+      <DropDownList
+        items={facilities}
+        placeholder="Select Facility"
+        zIndex={8000}
+        containerStyle={{
+        height: 50,
+        width: '100%',
+        marginTop: 8
+      }}
+        defaultValue=''
+        onChangeItem={item => setFacility({value: item.value, error: ''})} 
+        />
+        {facility.error ? <Text style={authData.dark ? stylesDark.error :styles.error}>{facility.error }</Text> : null}
+
+      
 
       <Button mode="contained" onPress={_onSignUpPressed} style={authData.dark ? stylesDark.button : styles.button}>
         Sign Up
       </Button>
       {/* <Text style={styles.label}> Or </Text> */}
-      <Button mode="contained" onPress={signUpWithFacebook} style={authData.dark ? stylesDark.button : styles.button}>
+      {/* <Button mode="contained" onPress={signUpWithFacebook} style={authData.dark ? stylesDark.button : styles.button}>
         Facebook
-      </Button>
+      </Button> */}
       {/* <ButtonsLogin  /> */}
       <View style={authData.dark ? stylesDark.row : styles.row}>
         <TouchableOpacity onPress={() => navigation.navigate('TermsService')}>
@@ -244,7 +286,19 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
    
-  },      
+  },     
+  labelDropDown:{
+    color:light.colors.primary,
+    textAlign:'left',
+    width:'100%',
+    paddingHorizontal:12,
+  },
+  error: {
+    fontSize: 14,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    color: light.colors.text
+  }, 
 });
 
 const stylesDark = StyleSheet.create({
@@ -270,5 +324,19 @@ const stylesDark = StyleSheet.create({
   link: {
     fontWeight: 'bold',
    
-  },      
+  },   
+  labelDropDown:{
+    color:dark.colors.primary,
+    textAlign:'left',
+    width:'100%',
+    paddingHorizontal:12,
+  },
+  error: {
+    fontSize: 14,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    color: dark.colors.text,
+    textAlign:'left',
+    width:'100%',
+  },   
 });

@@ -64,9 +64,9 @@ export default function SettingsScreen({navigation}) {
     },
      {
       "id": 4,
-      "name": "Help",
-      "icon": "lifebuoy",
-      "to": "url"
+      "name": "Change Facility",
+      "icon": "swap-horizontal",
+      "to": "change"
     }, {
       "id": 5,
       "name": "Logout",
@@ -77,12 +77,20 @@ export default function SettingsScreen({navigation}) {
 
   const logOutAuth = async () => {
     await AsyncStorage.removeItem('hasPayment');
+    await AsyncStorage.removeItem('facilities');
     firebase.auth().signOut();
-    setAuthData({
-      ...authData, 
-      islogged: false
-    })
+    // setAuthData({
+    //   ...authData, 
+    //   islogged: false,
+    // })
   };
+
+  function test() {
+     setAuthData({
+      ...authData, 
+      changeFacility: true
+    })
+  }
 
   function renderItem(data) {
     let {item, index} = data;
@@ -104,17 +112,33 @@ export default function SettingsScreen({navigation}) {
             </View>
             </>
           ) :(
+
+            item.to === 'change' ? (
             <>
-            <TouchableOpacity onPress={() => navigation.navigate(item.to)}>
-              <IconButton icon={item.icon} color='white' size={30}/>
+            <TouchableOpacity onPress={()=> navigation.navigate('ChangeFacility')}>
+               <IconButton icon={item.icon} color='white' size={30}/>
             </TouchableOpacity>
             
             <View style={authData.dark ? stylesDark.itemMeta : styles.itemMeta}>
-              <TouchableOpacity  onPress={() => navigation.navigate(item.to)}>
+              <TouchableOpacity  onPress={()=> navigation.navigate('ChangeFacility')}>
                 <Text style={authData.dark ? stylesDark.itemName : styles.itemName}>{item.name}</Text>
               </TouchableOpacity>
             </View>
             </>
+          ) :(
+            
+              <>
+              <TouchableOpacity onPress={() => navigation.navigate(item.to)}>
+                <IconButton icon={item.icon} color='white' size={30}/>
+              </TouchableOpacity>
+              
+              <View style={authData.dark ? stylesDark.itemMeta : styles.itemMeta}>
+                <TouchableOpacity  onPress={() => navigation.navigate(item.to)}>
+                  <Text style={authData.dark ? stylesDark.itemName : styles.itemName}>{item.name}</Text>
+                </TouchableOpacity>
+              </View>
+              </>
+            )
           )
        }
         
@@ -131,6 +155,7 @@ export default function SettingsScreen({navigation}) {
       <TouchableOpacity onPress={changeMode} style={authData.dark ? stylesDark.modeButton : styles.modeButton}>
         <IconButton color={authData.dark ? dark.colors.text : light.colors.text} icon="theme-light-dark" size={24}  />
       </TouchableOpacity>
+     
       <Logo></Logo>
        
       <Text style={authData.dark ? stylesDark.title : styles.title}>Settings</Text>

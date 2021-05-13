@@ -28,8 +28,7 @@
           "fetch"
         ],
         "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
-        "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This lets the application know if you are in a registered club, always"
+        "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app"
       },
       "bundleIdentifier": "com.dmonroy.Entertainer"
     },

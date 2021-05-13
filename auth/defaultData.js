@@ -9,6 +9,8 @@ const data = {
   available: false,
   dark: true,
   requestTables: [],
-  facilityId:''
+  facilityData:null,
+  changeFacility: false,
+  profile:{facility:''}
 }
 export default data;

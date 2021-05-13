@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {StyleSheet, Text, View, FlatList} from 'react-native';
 import {List, IconButton, Card, Surface, Appbar} from 'react-native-paper';
 
@@ -8,12 +8,15 @@ import TextInputForDate from '../components/TextInputDate';
 import Button from '../components/Botton'
 import FilterButton from '../components/FilterButton'
 import Header from '../components/Header'
-import {theme} from '../utils/theme'
+import {theme, dark, light} from '../utils/theme'
 //import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DropDownList from '../components/DropDownList';
 import BackButton from '../components/BackButton';
+import AuthContext from '../auth/context'
 
 export default function BillingScreen({navigation}) {
+
+  const {authData, setAuthData} = useContext(AuthContext)
 
   const data = [
     {
@@ -102,15 +105,15 @@ export default function BillingScreen({navigation}) {
         marginHorizontal: 5,
         flex: 1
       }}>
-        <Surface style={styles.surface}>
+        <Surface style={authData.dark ? stylesDark.surface : styles.surface}>
            <List.Item
-          style={styles.itemContainer}
+          style={authData.dark ? stylesDark.itemContainer : styles.itemContainer}
           title={item.date}
           description={item.description}
           right={props => <Text
           {...props}
           style={{
-          color: theme.colors.primary,
+          color: authData.dark? dark.colors.primary : light.colors.primary,
           fontSize: 25,
           marginVertical: 10,
           marginHorizontal: 5
@@ -136,7 +139,7 @@ export default function BillingScreen({navigation}) {
 
       {isFilterDatesVisibled
         ? (
-          <Card style={styles.cardDates}>
+          <Card style={authData.dark ? stylesDark.cardDates : styles.cardDates}>
             <Card.Content >
               <View style={{width:'100%'}}> 
                 <TextInputForDate
@@ -147,7 +150,7 @@ export default function BillingScreen({navigation}) {
                 : ''}
                 editable={false}
                 />
-                <IconButton  color={theme.colors.primary} icon="calendar" size={30} style={{
+                <IconButton  color={authData.dark ? dark.colors.primary : light.colors.primary} icon="calendar" size={30} style={{
                   position: 'absolute',
                   top: 0,
                   right: 0,
@@ -163,7 +166,7 @@ export default function BillingScreen({navigation}) {
                 : ''}
                 editable={false}
                 />
-                <IconButton  color={theme.colors.primary} icon="calendar" size={30} style={{
+                <IconButton  color={authData.dark ? dark.colors.primary  : light.colors.primary} icon="calendar" size={30} style={{
                   position: 'absolute',
                   top: 0,
                   right: 0,
@@ -222,11 +225,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   itemContainer: {
-    backgroundColor: theme.colors.inputBackground,
+    backgroundColor: light.colors.background,
     width: '100%',
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: theme.colors.accent
+    borderColor: light.colors.primary
   },
   surface:{
     borderRadius: 25,
@@ -246,13 +249,56 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     height: 150,
     width: '85%',
-    backgroundColor: theme.colors.inputBackground
+    backgroundColor: light.colors.inputBackground
   },
   cardFilter: {
     marginVertical: 10,
     height: 80,
     width: '85%',
-    backgroundColor: theme.colors.primary,
+    backgroundColor: light.colors.primary,
+     borderRadius: 25,
+  }
+});
+
+const stylesDark = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  itemContainer: {
+    backgroundColor: dark.colors.background,
+    width: '100%',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: dark.colors.primary
+  },
+  surface:{
+    borderRadius: 25,
+    elevation:3
+  },
+  containerDatePickers: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignContent: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    width: '100%',
+    height: 40
+  },
+  cardDates: {
+    marginVertical: 10,
+    height: 150,
+    width: '85%',
+    backgroundColor: dark.colors.inputBackground
+  },
+  cardFilter: {
+    marginVertical: 10,
+    height: 80,
+    width: '85%',
+    backgroundColor: dark.colors.primary,
      borderRadius: 25,
   }
 });

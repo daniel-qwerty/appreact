@@ -10,18 +10,29 @@ import Header from '../components/Header'
 import firebase from 'firebase';
 import AuthContext from '../auth/context'
 import {dark, light} from '../utils/theme'
+import defaultData from '../auth/defaultData'
 
 export default function RegisterScreen({navigation}) {
 
  const {authData, setAuthData} = useContext(AuthContext);
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async user  => {
+      console.log('welcomeuser',user);
       if (user && user.emailVerified) {
+        console.log('is loggin');
         //console.log(user);
-        setAuthData({...authData, islogged: true})
+      //  if(authData.changeFacility) {
+       //   navigation.navigate('ChangeFacility')
+      ///  } else {
+          const profile = await firebase.firestore().collection('entertainers').doc(firebase.auth().currentUser.uid).get();
+          setAuthData({...authData, islogged: true, changeFacility: false, profile: profile.data()})
+     //   }
       } else {
-        navigation.navigate('Login');
+        firebase.auth().signOut();
+        console.log('is no loggin');
+         setAuthData(defaultData)
+       // navigation.navigate('Login');
       }
     });
   }, []);
@@ -30,7 +41,6 @@ export default function RegisterScreen({navigation}) {
     <Background >
       <View style={authData.dark ? stylesDark.container : styles.container}>
         <Logo/>
-        <Text style={authData.dark ? stylesDark.title : styles.title}>Entertainer</Text>
         <Paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing.
         </Paragraph>

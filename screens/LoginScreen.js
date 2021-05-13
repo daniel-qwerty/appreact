@@ -1,7 +1,7 @@
 import {StatusBar}              from 'expo-status-bar';
 import React, {useContext, useState, useEffect}                    from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import {Snackbar } from 'react-native-paper';
+import {StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
+import {Snackbar, Dialog, Portal } from 'react-native-paper';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 
@@ -21,6 +21,7 @@ import {
 } from '../utils/utils';
 
 import firebase from 'firebase';
+import {saveToCache} from '../utils/utils';
 
 export default function LoginScreen({ navigation }) {
 
@@ -28,19 +29,27 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' });
   const [snackBarVisible, setSnackBarVisible] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
+  const [snackBarVisible2, setSnackBarVisible2] = useState(false);
+  const [snackBarMessage2, setSnackBarMessage2] = useState('');
   const [scanned, SetScanned] = useState(false);
   const [haveKeychain, SetHaveKeychain] = useState(false);
   const [isLoading,setIsLoading] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   const {authData, setAuthData} = useContext(AuthContext)
   const onDismissSnackBar = () => setSnackBarVisible(false);
+  const onDismissSnackBar2 = () => setSnackBarVisible(false);
+  
+  
 
-  const loginAuth = () => {
-    setAuthData({
-      ...authData, 
-      islogged: true
-    })
-  };
+  const closeRegisterModal = () => {
+    setShowRegisterModal(false)
+  }
+
+  function goToRegiterPage(){
+    setShowRegisterModal(false)
+    navigation.navigate('Register');
+  }
 
   const _checkUser = () => {
     const emailError = emailValidator(email.value);
@@ -63,6 +72,8 @@ export default function LoginScreen({ navigation }) {
     // }
   };
 
+  
+
    const signInWithEmail = async() => {
     setIsLoading(true); 
     await firebase
@@ -70,11 +81,13 @@ export default function LoginScreen({ navigation }) {
       .signInWithEmailAndPassword(email.value, password.value)
       .then(resp =>{
           var user = firebase.auth().currentUser;
+          console.log('user', user);
           if (user.emailVerified){
               save('entertainer', JSON.stringify({email: email.value, password: password.value}));
               SetScanned(true);
               setIsLoading(false);
-              loginAuth();
+            
+              setAuthData({...authData, islogged: true})
           } else {
             firebase.auth().signOut();
             setIsLoading(false);
@@ -92,10 +105,21 @@ export default function LoginScreen({ navigation }) {
               console.log('Weak Password!');
           } else {
               //this.onLoginFailure.bind(this)(errorMessage);
-              console.log(errorMessage);
-              setIsLoading(false);
-              setSnackBarMessage(errorMessage);
-              setSnackBarVisible(!snackBarVisible)
+               if (errorCode == 'auth/user-not-found') {
+                  console.log(errorCode);
+                  setIsLoading(false);
+                  setSnackBarMessage2('The user may have been deleted. Please register a new account');
+                  setSnackBarVisible2(!snackBarVisible)
+                
+                  
+
+               } else {
+                  console.log(errorCode);
+                  setIsLoading(false);
+                  setSnackBarMessage(errorMessage);
+                  setSnackBarVisible(!snackBarVisible)
+               } 
+              
           }
       });
   }
@@ -161,9 +185,36 @@ export default function LoginScreen({ navigation }) {
      }
   };
 
+  async function getFacilities() {
+    var all = [];
+    await firebase
+      .firestore()
+      .collection("facilities")
+      .get()
+      .then(function (querySnapshot) {
+        querySnapshot
+          .forEach(function (doc) {
+            all.push({
+              id: doc.id,
+              latitude: doc.data().latitude,
+              longitude: doc.data().longitude,
+              map: doc.data().map,
+              name: doc.data().name,
+            },)
+          });
+        console.log('facilities');  
+        //await AsyncStorage.getItem('facilities');
+        saveToCache('facilities',[...all], 24)
+       
+      
+        //console.log([...all]);
+      })
+ }
+
+
    useEffect(() => {
     checkStoreKeyChain('entertainer');
-    
+    getFacilities()
     //  let result =  SecureStore.deleteItemAsync('entertainer');
     //  console.log(result);
   }, []);
@@ -230,7 +281,25 @@ export default function LoginScreen({ navigation }) {
         }}>
         {snackBarMessage}
       </Snackbar>
+
+      <Snackbar
+        style={{backgroundColor:authData.dark ? dark.colors.primary : light.colors.primary}}
+        visible={snackBarVisible2}
+        onDismiss={onDismissSnackBar2}
+        action={{
+          label: 'Register',
+          onPress: () => {
+            // Do something
+            navigation.navigate('Register')
+          },
+        }}>
+        {snackBarMessage2}
+      </Snackbar>
+        
+       
        </View>
+
+      
       
     </Background>
   );

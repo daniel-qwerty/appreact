@@ -16,6 +16,7 @@ import { IconButton, Surface } from 'react-native-paper';
 import firebase from 'firebase';
 import AuthContext from '../auth/context'
 import data from '../auth/defaultData';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
 
@@ -113,66 +114,9 @@ import * as Location from 'expo-location';
 
 
 export default function App() {
-const Tab = createMaterialBottomTabNavigator();
-const {authData, setAuthData} = useContext(AuthContext)
-const [arrayFacilities,setArrayFacilities] = useState([]);
-const [location, setLocation] = useState(null);
-
-
-
-  
- 
-  // useEffect(() => {
-  //    console.log("object", authData.facilityId);
-  //   var colection = firebase.firestore()
-  //     .collection('interactions')
-  //     .where("entertainer", "==", firebase.auth().currentUser.uid.toString())
-  //     .where("facility", "==", authData.facilityId)
-  //     .where("sent", '==', true)
-   
-  //   const subscriber = 
-  //     colection
-  //     .onSnapshot(documentSnapshot => {
-  //        var dataTables = [];  
-  //       if(documentSnapshot.size !== 0) {
-  //         documentSnapshot.forEach(function (doc) { 
-  //             dataTables.push(doc.data())
-  //         })
-  //         setAuthData({...authData, requestTables: dataTables})
-  //       } else {
-  //         setAuthData({...authData, requestTables: []})
-  //       }
-  //     });
-  //   return () => subscriber();  
-  // }, []);
-
-  function distance(lon1, lat1, lon2, lat2) {
-  var R = 6371; // Radius of the earth in km
-  var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
-  var dLon = (lon2-lon1).toRad(); 
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
-          Math.sin(dLon/2) * Math.sin(dLon/2); 
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  var d = R * c; // Distance in km
-  return (d * 1000);
-}
-
-/** Converts numeric degrees to radians */
-if (typeof(Number.prototype.toRad) === "undefined") {
-  Number.prototype.toRad = function() {
-    return this * Math.PI / 180;
-  }
-}
-
-  if (location) {
-    console.log(location.coords.latitude, location.coords.longitude);
-    console.log(
-      distance(location.coords.longitude, location.coords.latitude, -63.160573 ,-17.629274)
-    );
-  } else {
-    console.log('cargando...');
-  }
+  const Tab = createMaterialBottomTabNavigator();
+  const {authData, setAuthData} = useContext(AuthContext)
+  const [arrayFacilities,setArrayFacilities] = useState([]);
 
 
  const customTabBarStyle = {
