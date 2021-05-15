@@ -32,6 +32,10 @@ export default function RegisterScreen({navigation}) {
     setIsLoading(true); 
     var auth = firebase.auth();
 
+    // auth.fetchSignInMethodsForEmail(email.value).then(function () {
+      
+    // })
+
     auth.sendPasswordResetEmail(email.value).then(function() {
       // Email sent.
       setSnackBarMessage(`We have emailed your password reset link to ${email.value}`);
@@ -39,7 +43,10 @@ export default function RegisterScreen({navigation}) {
       setSnackBarVisible(!snackBarVisible)
     }).catch(function(error) {
       // An error happened.
-      console.log(error);
+      setIsLoading(false); 
+      setSnackBarMessage('There is no user record corresponding to this identifier. The user may have been deleted.');
+      setSnackBarVisible(!snackBarVisible)
+ 
     });
 
    // navigation.navigate('Login');

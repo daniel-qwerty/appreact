@@ -349,9 +349,9 @@ const PaymentView = (props) => {
         const { data } =  event.nativeEvent;
          console.log(data)
         onCheckStatus(data)
-        //if(JSON.parse(data).error.code === 'api_key_expired'){
+        if(JSON.parse(data).error.code === 'api_key_expired'){
               showModalPaySuccess()
-       // }
+        }
     }
 
     return (

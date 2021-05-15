@@ -6,7 +6,6 @@ import Logo from '../components/Logo'
 import Background from '../components/Background'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Botton'
-import Header from '../components/Header'
 import firebase from 'firebase';
 import AuthContext from '../auth/context'
 import {dark, light} from '../utils/theme'
@@ -15,24 +14,16 @@ import defaultData from '../auth/defaultData'
 export default function RegisterScreen({navigation}) {
 
  const {authData, setAuthData} = useContext(AuthContext);
-
+ 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(async user  => {
-      console.log('welcomeuser',user);
       if (user && user.emailVerified) {
-        console.log('is loggin');
-        //console.log(user);
-      //  if(authData.changeFacility) {
-       //   navigation.navigate('ChangeFacility')
-      ///  } else {
           const profile = await firebase.firestore().collection('entertainers').doc(firebase.auth().currentUser.uid).get();
           setAuthData({...authData, islogged: true, changeFacility: false, profile: profile.data()})
      //   }
       } else {
         firebase.auth().signOut();
-        console.log('is no loggin');
          setAuthData(defaultData)
-       // navigation.navigate('Login');
       }
     });
   }, []);

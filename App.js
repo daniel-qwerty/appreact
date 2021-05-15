@@ -31,6 +31,7 @@ import * as Location from 'expo-location';
 const firebaseConfig = {
    apiKey: "AIzaSyDq-cEkNtbGLWRgZ6DlPQ1F4HY03SPi_Lw",
     authDomain: "enterteiner-1322c.firebaseapp.com",
+     databaseURL: "https://enterteiner-1322c-default-rtdb.firebaseio.com",
     projectId: "enterteiner-1322c",
     storageBucket: "enterteiner-1322c.appspot.com",
     messagingSenderId: "63643136082",

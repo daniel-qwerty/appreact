@@ -1,4 +1,4 @@
-import {StatusBar}              from 'expo-status-bar';
+import {StatusBar} from 'expo-status-bar';
 import React, {useContext, useState, useEffect}                    from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
 import {Snackbar, Dialog, Portal } from 'react-native-paper';
@@ -41,16 +41,6 @@ export default function LoginScreen({ navigation }) {
   const onDismissSnackBar2 = () => setSnackBarVisible(false);
   
   
-
-  const closeRegisterModal = () => {
-    setShowRegisterModal(false)
-  }
-
-  function goToRegiterPage(){
-    setShowRegisterModal(false)
-    navigation.navigate('Register');
-  }
-
   const _checkUser = () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
@@ -60,16 +50,7 @@ export default function LoginScreen({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-
     signInWithEmail();
-
-    // if(email.value === 'barbie@gmail.com' && password.value === '123456'){
-    //   save('entertainer', JSON.stringify({email: email.value, password: password.value}));
-    //   SetScanned(true);
-    //   loginAuth();
-    // } else {
-    //   setSnackBarVisible(!snackBarVisible)
-    // }
   };
 
   
@@ -110,16 +91,12 @@ export default function LoginScreen({ navigation }) {
                   setIsLoading(false);
                   setSnackBarMessage2('The user may have been deleted. Please register a new account');
                   setSnackBarVisible2(!snackBarVisible)
-                
-                  
-
                } else {
                   console.log(errorCode);
                   setIsLoading(false);
                   setSnackBarMessage(errorMessage);
                   setSnackBarVisible(!snackBarVisible)
                } 
-              
           }
       });
   }
@@ -132,13 +109,11 @@ export default function LoginScreen({ navigation }) {
     let result = await SecureStore.getItemAsync(key);
        console.log(result);
     if (result) {
-      // alert("🔐 Here's your value 🔐 \n" + result.email);
       SetHaveKeychain(true);
         if(!scanned)
           checkDeviceForHardware();
     } else {
       SetHaveKeychain(false);
-      //alert('No credentials of entertainer stored in the keychian, please login manually');
     }
   }
 
@@ -171,17 +146,10 @@ export default function LoginScreen({ navigation }) {
   async function handleAuthentication() {
      let result = await LocalAuthentication.authenticateAsync();
      if (result.success) {
-      //getValueFor('entertainer');
       let data = await SecureStore.getItemAsync('entertainer');
       setEmail({ value: JSON.parse(data).email, error: '' })
       setPassword({ value: JSON.parse(data).password, error: '' })
       console.log(JSON.parse(data).email);
-    
-     
-      // if(haveKeychain){
-      //   SetScanned(true);
-      //   //loginAuth();
-      // }
      }
   };
 
@@ -202,25 +170,37 @@ export default function LoginScreen({ navigation }) {
               name: doc.data().name,
             },)
           });
-        console.log('facilities');  
-        //await AsyncStorage.getItem('facilities');
         saveToCache('facilities',[...all], 24)
-       
-      
-        //console.log([...all]);
       })
  }
 
+ const getData = async () => {
+    try {
+     await AsyncStorage.getItem('facilities') .then(function(resultado) {
+          if(resultado) {
+              console.log('hayCache');
+          } else {
+            getFacilities();
+          }  
+      })
+      .catch(() => {
+          getFacilities();
+      })
+    } catch(e) {
+      // error reading value
+      console.log(e);
+    }
+  }
 
-   useEffect(() => {
+
+  useEffect(() => {
     checkStoreKeyChain('entertainer');
-    getFacilities()
-    //  let result =  SecureStore.deleteItemAsync('entertainer');
-    //  console.log(result);
+    getFacilities();
   }, []);
 
   return (
      <Background>
+       <StatusBar barStyle="light-content" /> 
         <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
        <View style={authData.dark ? stylesDark.container : styles.container}>
          <BackButton goBack={() => navigation.navigate('Welcome')} />

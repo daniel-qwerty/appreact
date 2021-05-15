@@ -19,13 +19,11 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "entitlements": {
-        "com.apple.developer.networking.wifi-info": "true"
-      },
       "infoPlist": {
         "UIBackgroundModes": [
           "location",
-          "fetch"
+          "fetch",
+          "processing"
         ],
         "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
         "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app"

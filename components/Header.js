@@ -12,7 +12,7 @@ export default function Header({children, props}) {
   return(
     <Appbar.Header {...props} style={{width:'100%',}}>
       {children}
-       <TouchableOpacity onPress={() => { WebBrowser.openBrowserAsync('https://www.myminks.com')}} >
+       <TouchableOpacity onPress={() => { WebBrowser.openBrowserAsync('https://www.myminx.com')}} >
            <Image style={{width:30, height:30, marginRight:5}} source={require('../assets/ButtonIcon.png')} />
        </TouchableOpacity>
     </Appbar.Header>

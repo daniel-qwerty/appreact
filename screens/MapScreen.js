@@ -20,8 +20,7 @@ import firebase from 'firebase';
 import "firebase/firestore";
 import * as Location from 'expo-location';
 import { useCallback } from 'react';
-
-
+//import myTask from '../services/myTask'
  const numColumns = 14;
 
 export default function DirectMessagesScreen({navigation}) {
@@ -74,6 +73,8 @@ export default function DirectMessagesScreen({navigation}) {
      _getLocationAsync()
   }, []);
 
+  
+
   function distance(lon1, lat1, lon2, lat2) {
   var R = 6371; // Radius of the earth in km
   var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
@@ -100,6 +101,7 @@ if(location && !inTheClub && myFacility ) {
 
      // console.log('CLUBi => ',myFacility.name);
       setTexto(`I'm in ${myFacility.name}`);   
+      ChangeStatus(true)
       setInTheClub(true);
       // changeFacility(doc.id);   
       //  setData(JSON.parse(doc.map));       
@@ -113,12 +115,13 @@ if(location && !inTheClub && myFacility ) {
         
         let dist = distance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
         if(dist <= distancia) {
-        //  console.log('aun sigo en => ',myFacility.name);   
+         console.log('aun sigo en => ',myFacility.name);   
           
           
         } else {
         //  console.log('me sali de rango');
           setTexto('Out of range');
+          ChangeStatus(false);
          // console.log('actulizo estado en la bd de inactivo');
           setInTheClub(false);
           //setAuthData({...authData, facilityData: {}})
@@ -136,6 +139,7 @@ if(location && !inTheClub && myFacility ) {
       // saving error
       console.log(e);
     }
+   // myTask.register() .then(() => console.log("task Register")).catch(error => console.log(error))
   }
 
   const formatData = (data, numColumns) => {
@@ -194,9 +198,22 @@ if(location && !inTheClub && myFacility ) {
     return () => subscriber();  
   }
 
-  async function getHasPayment() {
-    let value = await AsyncStorage.getItem('hasPayment')
-    setAuthData({...authData, hasPayment: value === 'true' ? true : false})
+  async function ChangeStatus(status) {
+    let user = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        availability: status,
+      })
+      .then(() => {
+          console.log("availability change successfully!");
+      })
+      .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating availability: ", error);
+    
+      });
   }
    
 
