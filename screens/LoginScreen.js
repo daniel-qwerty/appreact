@@ -174,28 +174,11 @@ export default function LoginScreen({ navigation }) {
       })
  }
 
- const getData = async () => {
-    try {
-     await AsyncStorage.getItem('facilities') .then(function(resultado) {
-          if(resultado) {
-              console.log('hayCache');
-          } else {
-            getFacilities();
-          }  
-      })
-      .catch(() => {
-          getFacilities();
-      })
-    } catch(e) {
-      // error reading value
-      console.log(e);
-    }
-  }
-
+ 
 
   useEffect(() => {
     checkStoreKeyChain('entertainer');
-    getFacilities();
+    //getFacilities();
   }, []);
 
   return (

@@ -93,6 +93,7 @@ export default function RegisterScreen({navigation}) {
                 userName: name.value,
                 phone: phone.value,
                 profileImage: `https://ui-avatars.com/api/?background=FD91B9&color=fff&size=200&name=${name.value}`,
+                thumbnail: `https://ui-avatars.com/api/?background=FD91B9&color=fff&size=200&name=${name.value}`,
                 created: Date.now(),
                 likes: 0,
                 dateBirth: null,
@@ -188,17 +189,7 @@ export default function RegisterScreen({navigation}) {
         keyboardType="email-address"
       />
 
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password.value}
-        onChangeText={text => setPassword({ value: text, error: '' })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
-
-      {/* <TextInput
+       <TextInput
         label="Phone"
         returnKeyType="next"
         value={phone.value}
@@ -209,10 +200,22 @@ export default function RegisterScreen({navigation}) {
         autoCompleteType="tel"
         textContentType="telephoneNumber"
         keyboardType="numbers-and-punctuation"
-      /> */}
+      />
+
+      <TextInput
+        label="Password"
+        returnKeyType="done"
+        value={password.value}
+        onChangeText={text => setPassword({ value: text, error: '' })}
+        error={!!password.error}
+        errorText={password.error}
+        secureTextEntry
+      />
+
+     
 
       {/* <Text style={authData.dark ? stylesDark.labelDropDown : styles.labelDropDown}>Select your Race</Text> */}
-      <DropDownList
+      {/* <DropDownList
         items={facilities}
         placeholder="Select Facility"
         zIndex={8000}
@@ -224,7 +227,7 @@ export default function RegisterScreen({navigation}) {
         defaultValue=''
         onChangeItem={item => setFacility({value: item.value, error: ''})} 
         />
-        {facility.error ? <Text style={authData.dark ? stylesDark.error :styles.error}>{facility.error }</Text> : null}
+        {facility.error ? <Text style={authData.dark ? stylesDark.error :styles.error}>{facility.error }</Text> : null} */}
 
       
 

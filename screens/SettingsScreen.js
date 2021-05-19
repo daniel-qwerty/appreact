@@ -64,9 +64,9 @@ export default function SettingsScreen({navigation}) {
     },
      {
       "id": 4,
-      "name": "Change Facility",
-      "icon": "swap-horizontal",
-      "to": "change"
+      "name": "Help",
+      "icon": "lifebuoy",
+      "to": "Help"
     }, {
       "id": 5,
       "name": "Logout",

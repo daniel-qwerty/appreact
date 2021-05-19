@@ -5,12 +5,14 @@ import {
   View,
   FlatList,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native';
 import {Surface, Appbar, IconButton} from 'react-native-paper';
 import { BlurView } from 'expo-blur';
 import Background from '../components/Background'
 import {theme, dark, light} from '../utils/theme'
+import {getDistance, saveToCache} from '../utils/utils'
 import Header from '../components/Header'
 //import {map1, map2}  from "../utils/dataMaps/map1";
 import AuthContext from '../auth/context'
@@ -32,7 +34,7 @@ export default function DirectMessagesScreen({navigation}) {
           documentSnapshot.forEach(function (doc) { 
               dataTables.push(doc.data())
           })
-          console.log('authdata', authData);
+        //  console.log('authdata', authData);
          // setAuthData({...authData, hasPayment: value == 'true'})
           setRequestTables(dataTables)
         } else {
@@ -50,10 +52,12 @@ export default function DirectMessagesScreen({navigation}) {
   const [location, setLocation] = useState(null);
   const [myFacility, setMyFacility] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [distancia, setDistancia] = useState(20);
+  const [distancia, setDistancia] = useState(50);
   const [texto, setTexto] = useState('');
   const [inTheClub, setInTheClub] = useState(false);
   const [requestTables, setRequestTables] = useState([]);
+  const [facilitiesPulled, setFacilitiesPulled] = useState(false);
+  const [textFindFacility, setTextFindFacility] = useState(false);
 
   async function _getLocationAsync() {
       let { status } = await Location.requestPermissionsAsync();
@@ -64,45 +68,91 @@ export default function DirectMessagesScreen({navigation}) {
         let lo = await Location.watchPositionAsync({accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 0.5}, function(loc) {
             if (loc ) {
             setLocation(loc);
+            
+            
             // console.log(distance(loc.coords.longitude, loc.coords.latitude, -63.160573 ,-17.629274));
           } 
         })
+        
+          
   }
 
   useEffect(() => {
      _getLocationAsync()
   }, []);
 
+ async function getFacilitiesFromCache() {
+   await AsyncStorage.getItem('facilities') .then(function(result) {
+      if(result) {
+          let data = JSON.parse(result)
+          console.log('hayCache');
+          data.data.forEach(element => {
+              let dist = getDistance(location.coords.longitude, location.coords.latitude, element.longitude, element.latitude);
+              console.log(dist);
+              if(dist <= distancia) {
+                console.log('en rango ', element.id);
+                 setMyFacility(element);
+                 setData(JSON.parse(element.map));
+                 fetchMyAlerts(element.id);
+                 setFacilitiesPulled(true);
+                return false;
+              } else {
+                console.log('object entraaaaa');
+              }
+          });
+      } else {
+        console.log('No hay 1');
+         getFacilities();
+      }  
+    })
+    .catch((error) => {
+        console.log(error);
+        getFacilities();
+    })
+ } 
+
+ async function getFacilities() {
+    var all = [];
+    await firebase
+      .firestore()
+      .collection("facilities")
+      .get()
+      .then(function (querySnapshot) {
+        querySnapshot
+          .forEach(function (doc) {
+            all.push({
+              id: doc.id,
+              latitude: doc.data().latitude,
+              longitude: doc.data().longitude,
+              map: doc.data().map,
+              name: doc.data().name,
+            },)
+          });
+        console.log('getfacilitiesMAP');  
+        //await AsyncStorage.getItem('facilities');
+       
+        saveToCache('facilities',[...all], 24);
+        getFacilitiesFromCache();
+       
+      
+        //console.log([...all]);
+      })
+ }
+if(location && !facilitiesPulled){
   
-
-  function distance(lon1, lat1, lon2, lat2) {
-  var R = 6371; // Radius of the earth in km
-  var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
-  var dLon = (lon2-lon1).toRad(); 
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
-          Math.sin(dLon/2) * Math.sin(dLon/2); 
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  var d = R * c; // Distance in km
-  return (d * 1000);
+      getFacilitiesFromCache();
 }
-
-/** Converts numeric degrees to radians */
-if (typeof(Number.prototype.toRad) === "undefined") {
-  Number.prototype.toRad = function() {
-    return this * Math.PI / 180;
-  }
-}
-
+  
 if(location && !inTheClub && myFacility ) {
-  
-    let dist = distance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
+
+    let dist = getDistance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
     if(dist <= distancia) {
 
      // console.log('CLUBi => ',myFacility.name);
       setTexto(`I'm in ${myFacility.name}`);   
-      ChangeStatus(true)
+      ChangeStatus(true, myFacility.id)
       setInTheClub(true);
+      setTextFindFacility(false);
       // changeFacility(doc.id);   
       //  setData(JSON.parse(doc.map));       
      // console.log('actulizo estado en la bd de activo'); 
@@ -110,10 +160,10 @@ if(location && !inTheClub && myFacility ) {
     
   } else {
       //setTexto('fuera de rango');
-      
+    
       if(inTheClub) {
         
-        let dist = distance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
+        let dist = getDistance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
         if(dist <= distancia) {
          console.log('aun sigo en => ',myFacility.name);   
           
@@ -121,11 +171,16 @@ if(location && !inTheClub && myFacility ) {
         } else {
         //  console.log('me sali de rango');
           setTexto('Out of range');
-          ChangeStatus(false);
+          setTextFindFacility(true);
+          setFacilitiesPulled(false);
+          ChangeStatus(false, '');
+          setData([]);
          // console.log('actulizo estado en la bd de inactivo');
           setInTheClub(false);
           //setAuthData({...authData, facilityData: {}})
         }
+      } else {
+        //setFacilitiesPulled(false);
       } 
     }
 
@@ -198,13 +253,14 @@ if(location && !inTheClub && myFacility ) {
     return () => subscriber();  
   }
 
-  async function ChangeStatus(status) {
+  async function ChangeStatus(status, facility) {
     let user = firebase.auth().currentUser;
     const db = firebase.firestore();
     db.collection("entertainers")
       .doc(user.uid)
       .update({
         availability: status,
+        facility: facility
       })
       .then(() => {
           console.log("availability change successfully!");
@@ -224,8 +280,8 @@ if(location && !inTheClub && myFacility ) {
        // const doc = await firebase.firestore().collection('entertainers').doc(firebase.auth().currentUser.uid).get();
       //  setUserFacility(doc.data().facility);
     
-        fetchMyAPI(authData.profile.facility);
-        fetchMyAlerts(authData.profile.facility);
+      //  fetchMyAPI(authData.profile.facility);
+        //fetchMyAlerts(authData.profile.facility);
         //setIsLoading(false);
       }
       fetchMyProfile() 
@@ -308,15 +364,19 @@ if(location && !inTheClub && myFacility ) {
         ) : <></>}
         <Appbar.Action onPress={changeMode} icon="theme-light-dark" />
       </Header>
-     
-          <Text style={{color:'white'}}>{texto}</Text> 
-      <FlatList
+      <Text style={{color:'white'}}>{texto}</Text> 
+      {textFindFacility? <>
+        <Text style={styles.OutRange}>We can't find a facility near you</Text>  
+      </> : <>
+       <FlatList
         data={formatData(data, numColumns)}
         extraData={formatData(data, numColumns)}
         style={styles.container}
         renderItem={renderItem}
         numColumns={numColumns}
         keyExtractor={(item, index) => index.toString()}/>
+      </>}
+      
       {(requestTables.length > 0 && !authData.hasPayment) ? (<> 
       <BlurView tint={authData.dark ? 'light' : 'dark'} intensity={80} style={[ styles.containerMessageInteraction]}>
         <Text  style={[{color:authData.dark ? 'black' : 'white'},styles.containerMessageInteractionText]}>Do you have Messages</Text>
@@ -395,6 +455,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 5
   },
+  OutRange: {
+    color: theme.colors.primary,
+    fontSize: 35,
+    textAlign:'center',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginVertical:'50%'
+  }
  
 });
 

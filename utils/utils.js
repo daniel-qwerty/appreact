@@ -26,8 +26,6 @@ export const latNameValidator = (latName) => {
   return '';
 };
 
-
-
 export const descriptionValidator = (description) => {
   if (!description || description.length <= 0) return 'Description cannot be empty.';
   return '';
@@ -97,16 +95,54 @@ export const uploadImageAsync = async (uri, directory, name) =>{
   };
 
   export const saveToCache = async (name, data, hours) => { 
-    var value = {data: data, expires: Date.now() + (hours*60*60*1000)}
+    var dateObj = new Date();
+    var month = dateObj.getUTCMonth() + 1; //months from 1-12
+    var day = dateObj.getUTCDate();
+    var year = dateObj.getUTCFullYear();
+    var value = {data: data, expires: `${year}-${month}-${day}`}
     await AsyncStorage.setItem(name, JSON.stringify(value))
    // return  value
     // return: { name, type, width, height, uri }
   };
 
-  export const getToCache = async (name) => { 
-    var value = {data: data, expires: Date.now() + (hours*60*60*1000)}
-    await AsyncStorage.setItem(name, JSON.stringify(value))
-   // return  value
-    // return: { name, type, width, height, uri }
+  export const checkToCache = async (name) => { 
+    await AsyncStorage.getItem(name) .then(function(result) {
+          if(result) {
+            
+              let data = JSON.parse(result)
+              var dateObj = new Date();
+              var now = `${dateObj.getUTCFullYear()}-${dateObj.getUTCMonth() + 1}-${dateObj.getUTCDate()}`
+              if(now === data.expires){
+                return(true); //valid cache
+              } else {
+                return(false); // no valid cache
+              }
+          } else {
+            console.log('dasdasdas');
+            return(false);
+          }
+      })
+      .catch(() => {
+          console.log('no esta en cache');
+          return(false);
+      })
   };
 
+  export const getDistance  = (lon1, lat1, lon2, lat2) => {
+    var R = 6371; // Radius of the earth in km
+    var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
+    var dLon = (lon2-lon1).toRad(); 
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2); 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return (d * 1000);
+  }
+
+   /** Converts numeric degrees to radians */
+  if (typeof(Number.prototype.toRad) === "undefined") {
+    Number.prototype.toRad = function() {
+      return this * Math.PI / 180;
+    }
+  }

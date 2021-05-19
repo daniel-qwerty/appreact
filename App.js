@@ -44,7 +44,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [authData, setAuthData] = useState(defaultData)
-  console.log('authdata APP', authData);
+ // console.log('authdata APP', authData);
   const [appIsReady, setAppIsReady] = useState(false);
 
  async function getFacilities() {
@@ -64,7 +64,7 @@ const App = () => {
               name: doc.data().name,
             },)
           });
-        console.log('facilities');  
+        //console.log('facilities');  
         //await AsyncStorage.getItem('facilities');
         saveToCache('facilities',[...all], 24)
        
@@ -93,18 +93,18 @@ const App = () => {
 
   const getData = async () => {
     try {
-     await AsyncStorage.getItem('facilities') .then(function(resultado) {
-          if(resultado) {
-              console.log('hayCache');
-          } else {
-            console.log('No hay');
-            getFacilities();
-          }  
-      })
-      .catch(() => {
-          console.log('No hay');
-          getFacilities();
-      })
+    //  await AsyncStorage.getItem('facilities') .then(function(resultado) {
+    //       if(resultado) {
+    //           console.log('hayCache');
+    //       } else {
+    //         console.log('No hay');
+    //         getFacilities();
+    //       }  
+    //   })
+    //   .catch(() => {
+    //       console.log('No hay');
+    //       getFacilities();
+    //   })
       const value = await AsyncStorage.getItem('darkMode')
       const hasPayments = await AsyncStorage.getItem('hasPayment')
       
