@@ -67,7 +67,7 @@ export default function UploadPhotos({navigation}) {
         alert("Item successfully deleted!")
         deleteFileFromStorage(`gallery/${firebase.auth().currentUser.uid}/`,(imageData.type != 'video') ? imageData.name : `${imageData.name}.mp4`)
         setShowDeleteModal(false)
-        
+        deleteAuxImages({id: imageData.id ,type: imageData.type, url: imageData.url, orientation: imageData.orientation})
         setIsLoading(false);
         fetchMyAPI()
     }).catch((error) => {
@@ -115,10 +115,15 @@ export default function UploadPhotos({navigation}) {
     console.log(name);
     if(imageData.tags && imageData.tags.indexOf(name) !== -1){
         deleteTags(name);
+         if(name === 'club') {
+            deleteAuxImages({id: imageData.id ,type: imageData.type, url: imageData.url, orientation: imageData.orientation})
+         }
     } else{
         if(name === 'club') {
           if(checkImagesClub()){
             saveTags(name)
+            console.log(imageData);
+            saveAuxImages({id: imageData.id ,type: imageData.type, url: imageData.url, orientation: imageData.orientation})
           } else {
             alert('You can only set 5 Club tags')
           }
@@ -129,6 +134,36 @@ export default function UploadPhotos({navigation}) {
        
     }
 
+  }
+
+  function saveAuxImages(name) {
+    firebase
+      .firestore().collection("entertainers")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        images: firebase.firestore.FieldValue.arrayUnion(name)
+      })
+      .then(() => {
+        fetchMyAPI()
+        setShowTagModal(false)
+    }).catch((error) => {
+        console.error("Error save tags: ", error);
+    });
+  }
+
+  function deleteAuxImages(name) {
+    firebase
+      .firestore().collection("entertainers")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        images: firebase.firestore.FieldValue.arrayRemove(name)
+      })
+      .then(() => {
+        fetchMyAPI()
+        setShowTagModal(false)
+    }).catch((error) => {
+        console.error("Error delete tags: ", error);
+    });
   }
 
   function saveTags(name) {
@@ -206,6 +241,7 @@ export default function UploadPhotos({navigation}) {
               favorite: doc.data().favorite,
               name: doc.data().name,
               tags: doc.data().tags,
+              orientation: doc.data().orientation,
               url: doc
                 .data()
                 .url
@@ -234,7 +270,7 @@ export default function UploadPhotos({navigation}) {
       return;
     }
 
-    if (pickerResult.type === "video" && pickerResult.duration > 5000) {
+    if (pickerResult.type === "video" && pickerResult.duration > 10000) {
       alert('You can only upload 10 seconds video')
       return;
     }
@@ -256,6 +292,9 @@ export default function UploadPhotos({navigation}) {
         if(width > height){
           imageOrientation = 'landscape'
         } else {
+          imageOrientation = 'portrait'
+        }
+        if(width == height) {
           imageOrientation = 'portrait'
         }
       }, (error) => {

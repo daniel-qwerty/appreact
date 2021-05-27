@@ -242,9 +242,6 @@ export default function ProfileScreen({navigation}) {
         {
           label: '',
           value: ''
-        },{
-          label: 'American Indian or Alaska Native',
-          value: 'American Indian or Alaska Native'
         }, {
           label: 'Asian',
           value: 'Asian'
