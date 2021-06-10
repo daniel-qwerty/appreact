@@ -12,10 +12,12 @@ import Header from '../components/Header'
 import Modal from 'react-native-modal';
 import AuthContext from '../auth/context'
 import Timer from '../components/Timer'
+import moment from "moment"
 
 export default function DirectMessagesScreen({navigation}) {
 
   const {authData, setAuthData} = useContext(AuthContext)
+
 
   const [response,
     setResponse] = useState()
@@ -28,36 +30,59 @@ export default function DirectMessagesScreen({navigation}) {
   const cartInfo = {
     id: '5eruyt35eggr76476236523t3',
     description: 'T Shirt - With react Native Logo',
-    amount: 1
+    amount: 19
   }
 
   const onCheckStatus = async(paymentResponse) => {
     setPaymentStatus('Please wait while confirming your payment!')
-    // setResponse(paymentResponse) let jsonResponse = JSON.parse(paymentResponse);
-    // perform operation to check payment status try {     const stripeResponse =
-    // await axios.post('http://localhost:8000/payment', {         email:
-    // 'codergogoi@gmail.com',         product: cartInfo,         authToken:
-    // jsonResponse     })     if(stripeResponse){         const { paid } =
-    // stripeResponse.data;         if(paid === true){ setPaymentStatus('Payment
-    // Success')         }else{ setPaymentStatus('Payment failed due to some issue')
-    //         }     }else{     setPaymentStatus(' Payment failed due to some
-    // issue')     } } catch (error) {     console.log(error)     setPaymentStatus('
-    // Payment failed due to some issue') }
-
   }
 
   const paymentUI = () => { < PaymentView style = {{backgroundColor:'red', with:'100%'}}onCheckStatus = {
-      onCheckStatus
-    }
-    product = {
-      cartInfo.description
-    }
-    amount = {
+        onCheckStatus
+      }
+      name = {
       cartInfo.amount
-    } />
-}
+    }
+      
+    />
+  }
 
-const [modalVisible, setModalVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(true);
+
+    function getDataAccount(){
+      if(authData.profile.name == null || authData.profile.lastName == null || authData.profile.idCusStripe == null){
+        alert('complete or update your personal data');
+        navigation.navigate('Account');
+      }
+      //console.log(authData.profile);
+    }
+
+    useEffect(()  => {
+      let now = moment(new Date()); //todays date
+      //var now = moment('2021-06-05T01:07:26'); //todays date
+      var end2 = moment(new Date()).add(1, 'days'); // another date
+      var end = moment('2021-06-10T10:26:19.716Z'); // another date
+      var duration = moment.duration(end.diff(now));
+      var days = duration.asDays();
+      var hours = duration.asHours();
+      var min = duration.asMinutes();
+      var sec = duration.asSeconds();
+    
+      // console.log('hours',hours);
+      // console.log('min',min);
+       console.log('sec',now);
+      console.log('now',moment.utc(duration.as('milliseconds')).format('HH:mm:ss'));
+      console.log('diference',end.diff(now, "milliseconds"));
+
+      const unsubscribe = navigation.addListener('focus', () => {
+      getDataAccount()
+    });
+
+    return unsubscribe;
+
+    
+      
+    }, [authData.profile]);
 
 
 return (
@@ -83,6 +108,8 @@ return (
       }}
         onCheckStatus={onCheckStatus}
         product={cartInfo.description}
+        name={`${authData.profile.lastName} ${authData.profile.name}`}
+        idCusStripe={authData.profile.idCusStripe}
         amount={cartInfo.amount}/>
 
 

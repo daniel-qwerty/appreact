@@ -13,37 +13,17 @@ import {theme, dark, light} from '../utils/theme'
 import DropDownList from '../components/DropDownList';
 import BackButton from '../components/BackButton';
 import AuthContext from '../auth/context'
+import axios from 'axios'
+import * as WebBrowser from 'expo-web-browser';
+import OverlayLoading from '../components/OverlayLoading';
 
 export default function BillingScreen({navigation}) {
 
   const {authData, setAuthData} = useContext(AuthContext)
-
-  const data = [
-    {
-      "date": "2020-12-12",
-      "description": "Be live 24hrs at Booby trap",
-      "total": 20
-    }, {
-      "date": "2020-12-12",
-      "description": "Be live 24hrs at Booby trap",
-      "total": 50
-    }, {
-      "date": "2020-12-12",
-      "description": "Be live 24hrs at Booby trap",
-      "total": 10
-    }, {
-      "date": "2020-12-12",
-      "description": "Be live 24hrs at Booby trap",
-      "total": 20
-    }, {
-      "date": "2020-12-12",
-      "description": "Be live 24hrs at Booby trap",
-      "total": 70
-    }
-  ]
-
-  const [listData,
-    setListData] = React.useState(data);
+  const [arrayHolder,setArrayHolder] = useState([]);
+  const [isLoading,setIsLoading] = useState(false);
+  
+ 
 
   const [dateFrom,
     setDateFrom] = useState(false);
@@ -97,6 +77,42 @@ export default function BillingScreen({navigation}) {
     hideDatePickerTo();
   };
 
+  async function getPaymentsStripe(){ 
+    setIsLoading(true);
+    await axios({
+        method: 'POST',
+        url: 'https://us-central1-test-minx.cloudfunctions.net/getInvoices',
+        data:{
+          customerId: authData.profile.idCusStripe,
+          limit: 50,
+        },
+    }).then(response => {
+        console.log('credao stripe');
+        //console.log(response.data);
+        let mydata = response.data.data;
+        setArrayHolder([...mydata]);
+        setIsLoading(false);
+    })
+    .catch(error => {
+        console.log(error.response);
+    })
+  }
+  
+  function convertDate(timestamp){
+    let d = new Date(timestamp*1000)
+    return(d.toLocaleDateString("en-US"));
+  }
+
+  function openReceipt (data) {
+    if(data.data[0].receipt_url){
+      WebBrowser.openBrowserAsync(data.data[0].receipt_url)
+    }
+  }
+  useEffect(()  => {
+    getPaymentsStripe()
+    
+  }, []);
+
   function renderItem({item}) {
     return (
       <View
@@ -107,32 +123,42 @@ export default function BillingScreen({navigation}) {
       }}>
         <Surface style={authData.dark ? stylesDark.surface : styles.surface}>
            <List.Item
+           onPress={() => openReceipt(item.charges)}
           style={authData.dark ? stylesDark.itemContainer : styles.itemContainer}
-          title={item.date}
-          description={item.description}
-          right={props => <Text
-          {...props}
-          style={{
-          color: authData.dark? dark.colors.primary : light.colors.primary,
-          fontSize: 25,
-          marginVertical: 10,
-          marginHorizontal: 5
-        }}>${item.total}</Text>}/>
+          title={convertDate(item.created)}
+          description={
+            <>
+            {item.last_payment_error ? <Text>{item.last_payment_error.message}</Text> : <Text>{item.description}</Text>}
+            </>
+            
+          }
+          right={props => 
+          <>
+          {item.last_payment_error ? null : 
+            <Text
+              {...props}
+              style={{
+              color: authData.dark? dark.colors.primary : light.colors.primary,
+              fontSize: 25,
+              marginVertical: 10,
+              marginHorizontal: 5
+            }}>${item.amount/100}</Text>
+          }
+          </>
+          }/>
         </Surface>
-       
       </View>
-
     );
   }
 
   return (
     
     <Background>
-
+      <OverlayLoading visible={isLoading} backgroundColor='rgba(0,0,0,0.6)'/>
       <Appbar.Header style={{width:'100%'}}>
       <Appbar.BackAction onPress={() => navigation.goBack()} />
       <Appbar.Content title="Financial information"  />
-      <Appbar.Action icon="calendar" onPress={showFilterDates} />
+      {/* <Appbar.Action icon="calendar" onPress={showFilterDates} /> */}
     </Appbar.Header>
 
     
@@ -177,7 +203,7 @@ export default function BillingScreen({navigation}) {
         )
         : ( <></>)}
 
-      <Card style={styles.cardFilter} zIndex={7000}>
+      {/* <Card style={styles.cardFilter} zIndex={7000}>
         <Card.Content >
           <DropDownList
             items={[
@@ -194,10 +220,11 @@ export default function BillingScreen({navigation}) {
             height: 50,
             width: '100%'
           }}
+          defaultValue="Outgoing"
           zIndex={7000}
             onChangeItem={item => console.log(item.label, item.value)}/>
         </Card.Content>
-      </Card>
+      </Card> */}
 
       <FlatList
         style={{
@@ -205,7 +232,7 @@ export default function BillingScreen({navigation}) {
         width: '85%',
         marginHorizontal: 10
       }}
-        data={listData}
+        data={arrayHolder}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         numColumns={1}

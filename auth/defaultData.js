@@ -5,6 +5,7 @@ const data = {
   showModalPaySuccess: false,
   showTimer: false,
   timer:"asda",
+  timeTimer:"0",
   hasPayment: false,
   available: false,
   dark: true,

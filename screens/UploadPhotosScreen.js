@@ -122,8 +122,8 @@ export default function UploadPhotos({navigation}) {
         if(name === 'club') {
           if(checkImagesClub()){
             saveTags(name)
-            console.log(imageData);
-            saveAuxImages({id: imageData.id ,type: imageData.type, url: imageData.url, orientation: imageData.orientation})
+            console.log(imageData.orientation);
+            saveAuxImages({id: imageData.id ,type: imageData.type, url: imageData.url, orientation: imageData.orientation ? imageData.orientation : '' })
           } else {
             alert('You can only set 5 Club tags')
           }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Minx",
     "slug": "Minx",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
@@ -20,10 +20,10 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
+        "buildNumber": "4",
         "UIBackgroundModes": [
           "location",
-          "fetch",
-          "processing"
+          "fetch"
         ],
         "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
         "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app"

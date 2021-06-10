@@ -1,71 +1,63 @@
-import React from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {StyleSheet, Text, View, ImageBackground} from 'react-native';
 import moment from "moment"
 import {Surface, Appbar} from 'react-native-paper';
 import {theme} from '../utils/theme'
 import AuthContext from '../auth/context'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default class Timer extends React.Component {
+export default Timer = () => {
+  const [timeText, setTimeText] = useState(true);
+  const {authData, setAuthData} = useContext(AuthContext)
 
-  static contextType = AuthContext
 
-  state = {
-    eventDate: moment
-      .duration()
-      .add({days: 0, hours: 24, minutes: 0, seconds: 0}), // add 9 full days
-    days: 0,
-    hours: 0,
-    mins: 0,
-    secs: 0
-  }
+  async function updateTimer() {
 
-  componentDidMount() {
-    //const data = this.context  console.log(data.authData)
-    this.updateTimer()
-  }
-  updateTimer = () => {
+    const x = setInterval(async()  => {
 
-    const x = setInterval(() => {
-      let {eventDate} = this.state
-      const data = this.context
-
-      if (data.authData.timer === 'stop') {
+      let now = moment(new Date());
+      let end = moment(authData.timeTimer); 
+      let diffe = end.diff(now, "milliseconds")
+      
+  
+      if (authData.timer === 'stop') {
         clearInterval(x)
       } else {
-        if (eventDate <= 0) {
+        if(diffe <= 0) {
           clearInterval(x)
+          await AsyncStorage.removeItem('hasPayment');
+          await AsyncStorage.removeItem('timeTimer');
+          setAuthData({...authData, hasPayment: hasPayments == 'false'})
         } else {
-          eventDate = eventDate.subtract(1, "s")
-          const days = eventDate.days()
-          const hours = eventDate.hours()
-          const mins = eventDate.minutes()
-          const secs = eventDate.seconds()
-          // const timer = {...this.state.authData, timer: `${hours} : ${mins} : ${secs}`}
-          this.setState({days, hours, mins, secs, eventDate})
-
+          // let now = moment(new Date()); 
+            // let end = moment(authData.timeTimer); // another date
+            //console.log('end', authData.timer);
+            let duration = moment.duration(end.diff(now));
+            //console.log('now',moment.utc(duration.as('milliseconds')).format('HH:mm:ss'));
+            //this.setState({days, hours, mins, secs, eventDate})
+            setTimeText(`${moment.utc(duration.as('milliseconds')).format('HH:mm:ss')}`);
         }
       }
 
-    }, 1000)
+    }, 1000, [authData])
 
   }
-  render() {
-    const data = this.context
-    const {days, hours, mins, secs} = this.state
-    return (
 
+  useEffect(() => {
+   updateTimer()
+  }, [authData]);
+
+  return (
+    <>
+     
       <Appbar.Content
         titleStyle={styles.appBarTimer}
         subtitleStyle={styles.appBarTimer}
-        title={`${hours} : ${mins} : ${secs}`}
-        subtitle={data.authData.available ? 'Available' : 'Not Available'}/>
-    // <Text>{`${days} : ${hours} : ${mins} : ${secs}`}</Text>
-
-    );
-  }
-
+        title={`${timeText}`}
+        subtitle={authData.available ? 'Available' : 'Not Available'}/>
+    </>
+  );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

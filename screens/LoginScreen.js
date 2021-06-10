@@ -62,7 +62,6 @@ export default function LoginScreen({ navigation }) {
       .signInWithEmailAndPassword(email.value, password.value)
       .then(resp =>{
           var user = firebase.auth().currentUser;
-          console.log('user', user);
           if (user.emailVerified){
               save('entertainer', JSON.stringify({email: email.value, password: password.value}));
               SetScanned(true);
@@ -81,18 +80,13 @@ export default function LoginScreen({ navigation }) {
           let errorCode = error.code;
           let errorMessage = error.message;
           if (errorCode == 'auth/weak-password') {
-              //this.onLoginFailure.bind(this)('Weak Password!');
               setIsLoading(false);
-              console.log('Weak Password!');
           } else {
-              //this.onLoginFailure.bind(this)(errorMessage);
                if (errorCode == 'auth/user-not-found') {
-                  console.log(errorCode);
                   setIsLoading(false);
                   setSnackBarMessage2('The user may have been deleted. Please register a new account');
                   setSnackBarVisible2(!snackBarVisible)
                } else {
-                  console.log(errorCode);
                   setIsLoading(false);
                   setSnackBarMessage(errorMessage);
                   setSnackBarVisible(!snackBarVisible)
@@ -107,7 +101,6 @@ export default function LoginScreen({ navigation }) {
 
   async function checkStoreKeyChain(key) {
     let result = await SecureStore.getItemAsync(key);
-       console.log(result);
     if (result) {
       SetHaveKeychain(true);
         if(!scanned)
@@ -149,7 +142,6 @@ export default function LoginScreen({ navigation }) {
       let data = await SecureStore.getItemAsync('entertainer');
       setEmail({ value: JSON.parse(data).email, error: '' })
       setPassword({ value: JSON.parse(data).password, error: '' })
-      console.log(JSON.parse(data).email);
      }
   };
 

@@ -16,9 +16,11 @@ import AccountScreen  from "./screens/AccountScreen";
 import BillingScreen  from "./screens/BillingScreen";
 import ProfileScreen  from "./screens/ProfileScreen";
 import TableScreen  from "./screens/TableScreen";
+import StartNightScreen  from "./screens/StarNigthScreen";
 import ChangeFacilityScreen  from "./screens/ChangeFacilityScreen";
 import UploadPhotosScreen  from "./screens/UploadPhotosScreen";
 import VerificationEmailScreen  from "./screens/VerificationEmailScreen";
+import BillingDetailScreen  from "./screens/BillingDetailScreen";
 import { dark, light, theme } from './utils/theme';
 import defaultData from './auth/defaultData'
 import AuthContext from './auth/context'
@@ -27,15 +29,26 @@ import AppLoading from 'expo-app-loading';
 import firebase from 'firebase';
 import {saveToCache} from './utils/utils';
 import * as Location from 'expo-location';
+import moment from "moment"
 
 const firebaseConfig = {
-   apiKey: "AIzaSyDq-cEkNtbGLWRgZ6DlPQ1F4HY03SPi_Lw",
+    AsyncStorageapiKey: "AIzaSyDq-cEkNtbGLWRgZ6DlPQ1F4HY03SPi_Lw",
+    apiKey: "AIzaSyDq-cEkNtbGLWRgZ6DlPQ1F4HY03SPi_Lw",
     authDomain: "enterteiner-1322c.firebaseapp.com",
-     databaseURL: "https://enterteiner-1322c-default-rtdb.firebaseio.com",
+    databaseURL: "https://enterteiner-1322c-default-rtdb.firebaseio.com",
     projectId: "enterteiner-1322c",
     storageBucket: "enterteiner-1322c.appspot.com",
     messagingSenderId: "63643136082",
     appId: "1:63643136082:web:cf7d647f33b9e02c24ef8b"
+
+    // AsyncStorageapiKey: "AIzaSyCS3bIa83-f-3n36T4CxAR9E9pW30JRnMM",
+    // apiKey: "AIzaSyCS3bIa83-f-3n36T4CxAR9E9pW30JRnMM",
+    // authDomain: "test-minx.firebaseapp.com",
+    // databaseURL: "https://enterteiner-1322c-default-rtdb.firebaseio.com",
+    // projectId: "test-minx",
+    // storageBucket: "test-minx.appspot.com",
+    // messagingSenderId: "406250302280",
+    // appId: "1:406250302280:web:7db89fd015f09bdd2e617d"
 }
 firebase.initializeApp(firebaseConfig);
 
@@ -107,8 +120,26 @@ const App = () => {
     //   })
       const value = await AsyncStorage.getItem('darkMode')
       const hasPayments = await AsyncStorage.getItem('hasPayment')
+      const timeTimer = await AsyncStorage.getItem('timeTimer')
+      console.log('HASPAYMENT', hasPayments);
+      console.log('TIMER', timeTimer);
+      if(hasPayments == 'true') {
+        console.log('HAY PAGO HECHO');
+        let now = moment(new Date());
+        let end = moment(timeTimer); 
+        let diffe = end.diff(now, "milliseconds")
+        if(diffe <= 0) {
+          await AsyncStorage.removeItem('hasPayment');
+          await AsyncStorage.removeItem('timeTimer');
+          setAuthData({...authData, dark: value === 'true', hasPayment: hasPayments == 'false'})
+        } else {
+          setAuthData({...authData, dark: value === 'true', hasPayment: hasPayments == 'true', showTimer: true, available: true, timeTimer: end})
+        }
+      } else {
+        setAuthData({...authData, dark: value === 'true', hasPayment: hasPayments == 'false'})
+      }
       
-      setAuthData({...authData, dark: value === 'true', hasPayment: hasPayments == 'true'})
+      //setAuthData({...authData, dark: value === 'true', hasPayment: hasPayments == 'true'})
     } catch(e) {
       // error reading value
       console.log(e);
@@ -139,10 +170,12 @@ const App = () => {
                   <Stack.Screen name="Account" component={AccountScreen}/>
                   <Stack.Screen name="Chat" component={ChatScreen}/>
                   <Stack.Screen name="Billing" component={BillingScreen}/>
+                  <Stack.Screen name="BillingDetail" component={BillingDetailScreen}/>
                   <Stack.Screen name="Table" component={TableScreen}/>
                   <Stack.Screen name="Profile" component={ProfileScreen}/>
                   <Stack.Screen name="UploadPhotos" component={UploadPhotosScreen}/>
                   <Stack.Screen name="ChangeFacility" component={ChangeFacilityScreen}/>
+                  <Stack.Screen name="StartNight" component={StartNightScreen} options={{ unmountOnBlur: true}}/>
                 </>
               ) : (
                 <>

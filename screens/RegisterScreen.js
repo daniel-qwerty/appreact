@@ -48,7 +48,6 @@ export default function RegisterScreen({navigation}) {
         
         let listData = []
         data.data.forEach(function (doc) {
-            console.log(doc.name);
             listData.push({label: doc.name, value: doc.id})
         })
         setFacilities(listData)
@@ -81,9 +80,8 @@ export default function RegisterScreen({navigation}) {
       .auth()
       .createUserWithEmailAndPassword(email.value, password.value)
       .then(resp =>{
-         console.log('registro');
          var user = firebase.auth().currentUser;
-
+        console.log('user',user);
         user.sendEmailVerification().then(function() {
             const db = firebase.firestore();
             db.collection("entertainers")
@@ -100,14 +98,23 @@ export default function RegisterScreen({navigation}) {
                 lastName: null,
                 name: null,
                 facility: facility.value
+              }).then(() => {
+                  console.log("Profile successfully Saved!");
+                  setIsLoading(false);
+                  navigation.navigate('VerificationEmail', {email: email.value}) 
+                  
+              })
+              .catch((error) => {
+                  // The document probably doesn't exist.
+                  console.error("Error register: ", error);
+                  setIsLoading(false);
               });
-              setIsLoading(false);
-              navigation.navigate('VerificationEmail', {email: email.value}) 
+              
           // setSnackBarMessage(`Your registration has been successful, we send you a verification email to ${email.value}`);
           // setSnackBarVisible(!snackBarVisible)
         }).catch(function(error) {
            
-          console.log(error);
+          console.log('error', error);
         });
           
         }
@@ -116,8 +123,6 @@ export default function RegisterScreen({navigation}) {
           let errorCode = error.code;
           let errorMessage = error.message;
           if (errorCode == 'auth/weak-password') {
-              //this.onLoginFailure.bind(this)('Weak Password!');
-              console.log('Weak Password!');
               setIsLoading(false);
               setSnackBarMessage('Weak Password!');
               setSnackBarVisible(!snackBarVisible)
@@ -255,10 +260,10 @@ export default function RegisterScreen({navigation}) {
         duration={5000}
         action={{
           label: 'X',
-          onPress: () => {
-            // Do something
-            console.log('object');
-          },
+          // onPress: () => {
+          //   // Do something
+          //   console.log('object');
+          // },
         }}>
         {snackBarMessage}
       </Snackbar>

@@ -33,7 +33,6 @@ import * as Location from 'expo-location';
 //     const subscriber = 
 //       colection
 //       .onSnapshot(documentSnapshot => {
-//         console.log(documentSnapshot.size);
 //         if(documentSnapshot.size !== 0) {
 //           setAuthData({...authData, haveMessages: true})
 //         } else {
@@ -106,7 +105,6 @@ import * as Location from 'expo-location';
 //   const [location] = locations;
 //   try {
   
-//     console.log(locations);
 //   } catch (err) {
 //     console.error(err);
 //   }

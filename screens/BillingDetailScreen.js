@@ -34,7 +34,7 @@ import {
 } from '../utils/utils';
 
 
-export default function ProfileScreen({navigation}) {
+export default function BillingDetailScreen({navigation}) {
 
   const {authData, setAuthData} = useContext(AuthContext)
   const [selectedImage, setSelectedImage] = useState({ localUri: null, remoteUri: null });
@@ -105,7 +105,6 @@ export default function ProfileScreen({navigation}) {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
        quality: 0.3,
     });
-    //console.log(pickerResult);
     if (pickerResult.cancelled === true) {
       return;
     }
@@ -164,7 +163,6 @@ export default function ProfileScreen({navigation}) {
         updated: Date.now(),
       })
       .then(() => {
-          console.log("Profile successfully Saved!");
           setSnackBarMessage('Profile successfully Saved!');
           setSnackBarVisible(!snackBarVisible)
            setAuthData({...authData, profile: {...authData.profile, 
@@ -369,7 +367,6 @@ export default function ProfileScreen({navigation}) {
           label: 'X',
           // onPress: () => {
           //   // Do something
-          //   console.log('object');
           // },
         }}>
         {snackBarMessage}

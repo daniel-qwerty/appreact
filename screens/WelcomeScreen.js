@@ -35,7 +35,7 @@ export default function RegisterScreen({navigation}) {
               name: doc.data().name,
             },)
           });
-        console.log('getfacilities');  
+        
         
       })
       await saveToCache('facilities',[...all], 24)
@@ -43,7 +43,6 @@ export default function RegisterScreen({navigation}) {
 
  const checkFacilitiesFromChache = async () => {
     try {
-      console.log('object');
     await AsyncStorage.getItem('facilities') .then(async function(result) {
           if(result) {
             

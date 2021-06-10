@@ -85,10 +85,10 @@ export default function RegisterScreen({navigation}) {
         duration={5000}
         action={{
           label: 'X',
-          onPress: () => {
-            // Do something
-            console.log('object');
-          },
+          // onPress: () => {
+          //   // Do something
+          //   console.log('object');
+          // },
         }}>
         {snackBarMessage}
       </Snackbar>

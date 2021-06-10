@@ -22,7 +22,8 @@ import firebase from 'firebase';
 import "firebase/firestore";
 import * as Location from 'expo-location';
 import { useCallback } from 'react';
-//import myTask from '../services/myTask'
+import myTask from '../services/myTask'
+
  const numColumns = 14;
 
 export default function DirectMessagesScreen({navigation}) {
@@ -52,8 +53,9 @@ export default function DirectMessagesScreen({navigation}) {
   const [location, setLocation] = useState(null);
   const [myFacility, setMyFacility] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [distancia, setDistancia] = useState(50);
+  const [distancia, setDistancia] = useState(2000);
   const [texto, setTexto] = useState('');
+  const [clubId, setClubId] = useState(null);
   const [inTheClub, setInTheClub] = useState(false);
   const [requestTables, setRequestTables] = useState([]);
   const [facilitiesPulled, setFacilitiesPulled] = useState(false);
@@ -88,20 +90,16 @@ export default function DirectMessagesScreen({navigation}) {
           console.log('hayCache');
           data.data.forEach(element => {
               let dist = getDistance(location.coords.longitude, location.coords.latitude, element.longitude, element.latitude);
-              console.log(dist);
               if(dist <= distancia) {
-                console.log('en rango ', element.id);
                  setMyFacility(element);
                  setData(JSON.parse(element.map));
                  fetchMyAlerts(element.id);
+                 setClubId(element.id);
                  setFacilitiesPulled(true);
                 return false;
-              } else {
-                console.log('object entraaaaa');
-              }
+              } 
           });
       } else {
-        console.log('No hay 1');
          getFacilities();
       }  
     })
@@ -128,14 +126,10 @@ export default function DirectMessagesScreen({navigation}) {
               name: doc.data().name,
             },)
           });
-        console.log('getfacilitiesMAP');  
         //await AsyncStorage.getItem('facilities');
        
         saveToCache('facilities',[...all], 24);
         getFacilitiesFromCache();
-       
-      
-        //console.log([...all]);
       })
  }
 if(location && !facilitiesPulled){
@@ -166,21 +160,15 @@ if(location && !inTheClub && myFacility ) {
         let dist = getDistance(location.coords.longitude, location.coords.latitude, myFacility.longitude , myFacility.latitude);
         if(dist <= distancia) {
          console.log('aun sigo en => ',myFacility.name);   
-          
-          
         } else {
-        //  console.log('me sali de rango');
           setTexto('Out of range');
           setTextFindFacility(true);
           setFacilitiesPulled(false);
           ChangeStatus(false, '');
           setData([]);
-         // console.log('actulizo estado en la bd de inactivo');
+          // console.log('actulizo estado en la bd de inactivo');
           setInTheClub(false);
-          //setAuthData({...authData, facilityData: {}})
         }
-      } else {
-        //setFacilitiesPulled(false);
       } 
     }
 
@@ -188,13 +176,12 @@ if(location && !inTheClub && myFacility ) {
     try {
       setIsSwitchOn(!isSwitchOn);
       setAuthData({...authData, dark: !isSwitchOn})
-     // console.log(JSON.stringify(data));
       await AsyncStorage.setItem('darkMode', !isSwitchOn ? 'true' : 'false')
     } catch (e) {
       // saving error
       console.log(e);
     }
-   // myTask.register() .then(() => console.log("task Register")).catch(error => console.log(error))
+    //myTask.register() .then(() => console.log("task Register")).catch(error => console.log(error))
   }
 
   const formatData = (data, numColumns) => {
@@ -210,20 +197,13 @@ if(location && !inTheClub && myFacility ) {
   };
 
   async function fetchMyAPI(facilityId) {
-    // const doc = await firebase.firestore().collection('facilities').doc(facilityId).get();
-    // console.log((doc.data().name));
-    // setData(JSON.parse(doc.data().map));
-
     AsyncStorage.getItem('facilities') .then(function(res) {
       if(res) {
         let data = JSON.parse(res);
-        console.log(facilityId);
         var _data = data.data.find(function(post, index) {
             if(post.id == facilityId)
               return true;
         });
-
-        console.log('N-> ', _data.name);
         setMyFacility(_data);
         setData(JSON.parse(_data.map));
 
@@ -268,7 +248,6 @@ if(location && !inTheClub && myFacility ) {
       .catch((error) => {
           // The document probably doesn't exist.
           console.error("Error updating availability: ", error);
-    
       });
   }
    
@@ -318,7 +297,8 @@ if(location && !inTheClub && myFacility ) {
                 : theme.colors.accent
             }
           ]}
-            onPress={() => navigation.navigate('Table', {club: authData.profile.facility, table:item.table})}>
+            // onPress={() => navigation.navigate('Table', {club: authData.profile.facility, table:item.table})}>
+            onPress={() => navigation.navigate('Table', {club: clubId, table:item.table})}>
             <Text
               style={[
               styles.itemText, {
@@ -467,4 +447,6 @@ const styles = StyleSheet.create({
   }
  
 });
+
+
 

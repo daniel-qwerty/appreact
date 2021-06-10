@@ -17,6 +17,7 @@ import Modal from 'react-native-modal';
 import firebase from 'firebase';
 import "firebase/firestore";
 import AuthContext from '../auth/context'
+import axios from 'axios'
 
 export default function AccountScreen({navigation}) {
   const [name,
@@ -28,16 +29,18 @@ export default function AccountScreen({navigation}) {
   const [phone,
     setPhone] = useState({value: '', error: ''});
   const [isLoading,setIsLoading] = useState(false);  
+  const [idcusStripe,setIdcusStripe] = useState('');  
 
   const [date, setDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const {authData, setAuthData} = useContext(AuthContext)  
+    const [dateBirth,
+    setDateBirth] = useState(false);
 
   function openModalDeleteMedia() {
     setShowDeleteModal(true);
-    console.log('dasds');
   };
 
   const closeDeleteModal = () => {
@@ -56,7 +59,7 @@ export default function AccountScreen({navigation}) {
   };
 
 
-  const _onSignUpPressed = () => {
+  const _onSignUpPressed = async () => {
     const nameError = nameValidator(name.value);
     const emailError = emailValidator(email.value);
     const lastNameError = latNameValidator(lastName.value);
@@ -72,7 +75,16 @@ export default function AccountScreen({navigation}) {
       return;
     }
 
-    //save changes on firestore
+
+    if(idcusStripe == "" || idcusStripe == null){
+       createCustomerStripe()
+    } else {
+      saveToFirebase()
+      updateCustomerStripe(idcusStripe);
+    }
+  };
+
+  function saveToFirebase(){
     var user = firebase.auth().currentUser;
     const db = firebase.firestore();
     db.collection("entertainers")
@@ -83,22 +95,63 @@ export default function AccountScreen({navigation}) {
         phone: phone.value,
         dateBirth: date,
         updated: Date.now(),
+        idCusStripe: idcusStripe
       })
       .then(() => {
-          console.log("Document successfully Saved!");
+          console.log("Document u successfully Saved!");
           setIsLoading(false);
+          setAuthData({...authData, profile: {...authData.profile, 
+            name: name.value, 
+            lastName: lastName.value,
+            phone: phone.value,
+            dateBirth: date,
+            updated: Date.now(),
+            idCusStripe: idcusStripe
+          } })
       })
       .catch((error) => {
           // The document probably doesn't exist.
           console.error("Error updating document: ", error);
           setIsLoading(false);
       });
+  }
 
-    //navigation.navigate('Dashboard');
-  };
 
-  const [dateBirth,
-    setDateBirth] = useState(false);
+  function setIdCustomerStripeFB(id){
+    var user = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        idCusStripe: id,
+        name: name.value,
+        lastName: lastName.value,
+        phone: phone.value,
+        dateBirth: date,
+        updated: Date.now(),
+      })
+      .then(() => {
+          console.log("isdus successfully Saved!");
+          setIdcusStripe(id);
+          setIsLoading(false);
+          setAuthData({...authData, profile: {...authData.profile, 
+            name: name.value, 
+            lastName: lastName.value,
+            phone: phone.value,
+            dateBirth: date,
+            updated: Date.now(),
+            idCusStripe: id
+          } })
+          
+      })
+      .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating idcus: ", error);
+          setIsLoading(false);
+      });
+  }
+
+
 
   
 
@@ -109,12 +162,67 @@ export default function AccountScreen({navigation}) {
     setLastName({value: doc.data().lastName, error: ''})
     setEmail({value: doc.data().email, error: ''})
     setPhone({value: doc.data().phone, error: ''})
+    setIdcusStripe(doc.data().idCusStripe)
     setIsLoading(false);
   }
 
+  async function createCustomerStripe(){ 
+    await axios({
+        method: 'POST',
+        url: 'https://us-central1-test-minx.cloudfunctions.net/createCustomer',
+        data:{
+          email: email.value,
+          name: `${name.value} ${lastName.value}`,
+          phone: phone.value
+        },
+    }).then(response => {
+        console.log('credao stripe');
+        console.log(response.data);
+        setIdCustomerStripeFB(response.data.id)
+        
+    })
+    .catch(error => {
+        console.log(error.response);
+    })
+  }
+
+  async function updateCustomerStripe(id){
+    
+    await axios({
+        method: 'POST',
+        url: "https://us-central1-test-minx.cloudfunctions.net/updateCustomer",
+        data:{
+          customerId: id,
+          email: email.value,
+          name: `${name.value} ${lastName.value}`,
+          phone: phone.value
+        }
+    }).then(response => {
+        // console.log(response.data);
+        console.log('customer stripe actualizado');
+        return true
+    })
+    .catch(error => {
+        console.log(error.response);
+        console.log('customer stripe no actualizado');
+        return false
+    })
+  }
+
   useEffect(()  => {
-    fetchMyAPI()   
-  }, []);
+    if(!authData.profile){
+      fetchMyAPI()   
+    } else {
+      
+        setName({value: authData.profile.name, error: ''})
+        setLastName({value: authData.profile.lastName, error: ''})
+        setEmail({value: authData.profile.email, error: ''})
+        setPhone({value: authData.profile.phone, error: ''})
+        setIdcusStripe(authData.profile.idCusStripe)
+        
+    }
+    
+  }, [authData.profile]);
 
   return (
     <BackgroundHome>
