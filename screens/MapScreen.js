@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,7 +6,8 @@ import {
   FlatList,
   Dimensions,
   TouchableOpacity,
-  Image
+  Image,
+  Button, Platform
 } from 'react-native';
 import {Surface, Appbar, IconButton} from 'react-native-paper';
 import { BlurView } from 'expo-blur';
@@ -23,11 +24,26 @@ import "firebase/firestore";
 import * as Location from 'expo-location';
 import { useCallback } from 'react';
 import myTask from '../services/myTask'
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import axios from 'axios'
 
- const numColumns = 14;
+const numColumns = 14;
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function DirectMessagesScreen({navigation}) {
 
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
   const {authData, setAuthData} = useContext(AuthContext)
   const suscriptionAux = useCallback(documentSnapshot => {
          let dataTables = [];  
@@ -250,6 +266,22 @@ if(location && !inTheClub && myFacility ) {
           console.error("Error updating availability: ", error);
       });
   }
+
+  async function savePushNotifToken(token) {
+    let user = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("entertainers")
+      .doc(user.uid)
+      .update({
+        pushToken: token,
+      })
+      .then(() => {
+          console.log("push token save successfully!");
+      })
+      .catch((error) => {
+          console.error("Error save push token: ", error);
+      });
+  }
    
 
   useEffect(()  => {
@@ -265,17 +297,60 @@ if(location && !inTheClub && myFacility ) {
       }
       fetchMyProfile() 
       
-  }, [authData.profile.facility]);    
+  }, [authData.profile.facility]);   
+  
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      savePushNotifToken(token);
+      console.log(token);
+      alert(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
 
-  // useEffect(() => {
-     
-  //   //getEntertainerFacility();
-  //   // Change the state every second or the time given by User.
-  //   const interval = setInterval(() => {
-  //     setShowText((showText) => !showText);
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    return token;
+  }
+
+  useEffect(()  => {
+   
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    // This listener is fired whenever a notification is received while the app is foregrounded
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   function renderItem({item, index}) {
   
