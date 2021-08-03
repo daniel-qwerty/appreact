@@ -1,47 +1,42 @@
 {
-  "expo": {
-    "name": "Minx",
-    "slug": "Minx",
-    "version": "1.0.3",
-    "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": false,
-      "infoPlist": {
-        "buildNumber": "5",
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ],
-        "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
-        "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app"
-      },
-      "bundleIdentifier": "com.dmonroy.Entertainer"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "facebookAutoInitEnabled": true,
-    "facebookScheme": "fb1461728394088946",
-    "facebookAppId": "1461728394088946",  
-    "facebookDisplayName": "Minx"
-  }
+    "expo": {
+        "name": "Minx",
+        "slug": "Minx",
+        "version": "1.0.5",
+        "orientation": "portrait",
+        "userInterfaceStyle": "automatic",
+        "icon": "./assets/icon.png",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": false,
+            "infoPlist": {
+                "buildNumber": "6",
+                "UIBackgroundModes": ["location", "fetch"],
+                "NSFaceIDUsageDescription": "This allows you to securely sign in to your App",
+                "NSLocationWhenInUseUsageDescription": "This lets the application know if you are in a registered club, when you use the app"
+            },
+            "bundleIdentifier": "com.dmonroy.Entertainer"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#FFFFFF"
+            }
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "facebookAutoInitEnabled": true,
+        "facebookScheme": "fb1461728394088946",
+        "facebookAppId": "1461728394088946",
+        "facebookDisplayName": "Minx"
+    }
 }

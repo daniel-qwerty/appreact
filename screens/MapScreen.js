@@ -69,7 +69,7 @@ export default function DirectMessagesScreen({navigation}) {
   const [location, setLocation] = useState(null);
   const [myFacility, setMyFacility] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [distancia, setDistancia] = useState(2000);
+  const [distancia, setDistancia] = useState(3220);
   const [texto, setTexto] = useState('');
   const [clubId, setClubId] = useState(null);
   const [inTheClub, setInTheClub] = useState(false);
@@ -315,7 +315,6 @@ if(location && !inTheClub && myFacility ) {
       token = (await Notifications.getExpoPushTokenAsync()).data;
       savePushNotifToken(token);
       console.log(token);
-      alert(token);
     } else {
       alert('Must use physical device for Push Notifications');
     }
@@ -330,6 +329,21 @@ if(location && !inTheClub && myFacility ) {
     }
 
     return token;
+  }
+
+  async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got mail! 📬",
+        body: 'Here is the notification body',
+        data: { data: 'goes here' },
+      },
+      trigger: { seconds: 60, repeats:true },
+    });
+  }
+
+  async function cacelSchedulePushNotification() {
+    await Notifications.cancelAllScheduledNotificationsAsync();
   }
 
   useEffect(()  => {
@@ -420,6 +434,18 @@ if(location && !inTheClub && myFacility ) {
         <Appbar.Action onPress={changeMode} icon="theme-light-dark" />
       </Header>
       <Text style={{color:'white'}}>{texto}</Text> 
+       {/* <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await schedulePushNotification();
+        }}
+      />
+       <Button
+        title="Cancel schedule a notification"
+        onPress={async () => {
+          await cacelSchedulePushNotification();
+        }}
+      /> */}
       {textFindFacility? <>
         <Text style={styles.OutRange}>We can't find a facility near you</Text>  
       </> : <>
