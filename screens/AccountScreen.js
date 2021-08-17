@@ -261,7 +261,7 @@ export default function AccountScreen({ navigation }) {
 
       <View style={authData.dark ? stylesDark.container : styles.container}>
         <TextInput
-          label="User Name"
+          label="Profile Name"
           returnKeyType="next"
           value={userName.value}
           onChangeText={(text) => setUserName({ value: text, error: "" })}

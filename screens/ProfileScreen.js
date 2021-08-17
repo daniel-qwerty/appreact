@@ -356,6 +356,7 @@ export default function ProfileScreen({ navigation }) {
           ]}
           placeholder="Select your Race"
           zIndex={8000}
+          maxHeight={500}
           containerStyle={{
             height: 50,
             width: "100%",
@@ -408,6 +409,8 @@ export default function ProfileScreen({ navigation }) {
             width: "100%",
           }}
           zIndex={7000}
+          itemSeparator={true}
+          height={900}
           defaultValue={bodyType.value}
           onChangeItem={(item) => setBodyType({ value: item.value, error: "" })}
         />
